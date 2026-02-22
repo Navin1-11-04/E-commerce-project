@@ -11,6 +11,7 @@ import PortalLogin from './PortalLogin';
 import PortalRegistration from './PortalRegistration';
 import { treeManager } from '../lib/mlmTree';
 import type { UserData } from '../types';
+import { CartProvider } from '../context/CartContext'; // ← ADD THIS
 
 import Login from './Login';
 import CustomerRegistration from './CustomerRegistration';
@@ -178,71 +179,73 @@ const AuthApp = (): JSX.Element => {
   };
 
   return (
-    <div>
-      {renderCurrentView()}
-      
-      {/* Only show navigation bar if not in portal view or 2FA view */}
-      {currentView !== 'portalView' && currentView !== 'twoFactorAuth' && (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-2xl p-2 flex space-x-2 border-2 border-gray-200 z-50">
-          <button
-            onClick={() => {
-              setCurrentUser(null);
-              setTwoFactorAuthUser(null);
-              setCurrentView("login");
-            }}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              currentView === "login"
-                ? "bg-gray-700 text-white shadow-md"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            🔐 Login
-          </button>
-          <button
-            onClick={() => {
-              setCurrentUser(null);
-              setTwoFactorAuthUser(null);
-              setCurrentView("customer");
-            }}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              currentView === "customer"
-                ? "bg-blue-500 text-white shadow-md"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            👤 Customer
-          </button>
-          <button
-            onClick={() => {
-              setCurrentUser(null);
-              setTwoFactorAuthUser(null);
-              setCurrentView("brandOwner");
-            }}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              currentView === "brandOwner"
-                ? "bg-purple-500 text-white shadow-md"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            🏢 Brand
-          </button>
-          <button
-            onClick={() => {
-              setCurrentUser(null);
-              setTwoFactorAuthUser(null);
-              setCurrentView("tree");
-            }}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              currentView === "tree"
-                ? "bg-green-500 text-white shadow-md"
-                : "text-gray-600 hover:bg-gray-100"
-            }`}
-          >
-            🌳 Tree
-          </button>
-        </div>
-      )}
-    </div>
+    <CartProvider> {/* ← WRAP EVERYTHING HERE */}
+      <div>
+        {renderCurrentView()}
+        
+        {/* Only show navigation bar if not in portal view or 2FA view */}
+        {currentView !== 'portalView' && currentView !== 'twoFactorAuth' && (
+          <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-2xl p-2 flex space-x-2 border-2 border-gray-200 z-50">
+            <button
+              onClick={() => {
+                setCurrentUser(null);
+                setTwoFactorAuthUser(null);
+                setCurrentView("login");
+              }}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                currentView === "login"
+                  ? "bg-gray-700 text-white shadow-md"
+                  : "text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              🔐 Login
+            </button>
+            <button
+              onClick={() => {
+                setCurrentUser(null);
+                setTwoFactorAuthUser(null);
+                setCurrentView("customer");
+              }}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                currentView === "customer"
+                  ? "bg-blue-500 text-white shadow-md"
+                  : "text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              👤 Customer
+            </button>
+            <button
+              onClick={() => {
+                setCurrentUser(null);
+                setTwoFactorAuthUser(null);
+                setCurrentView("brandOwner");
+              }}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                currentView === "brandOwner"
+                  ? "bg-purple-500 text-white shadow-md"
+                  : "text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              🏢 Brand
+            </button>
+            <button
+              onClick={() => {
+                setCurrentUser(null);
+                setTwoFactorAuthUser(null);
+                setCurrentView("tree");
+              }}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                currentView === "tree"
+                  ? "bg-green-500 text-white shadow-md"
+                  : "text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              🌳 Tree
+            </button>
+          </div>
+        )}
+      </div>
+    </CartProvider>
   );
 };
 

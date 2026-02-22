@@ -12,6 +12,7 @@ import PortalSetupStep2 from './PortalSetupStep2';
 import PortalSetupStep3 from './PortalSetupStep3';
 import PortalSetupStep4 from './PortalSetupStep4';
 import type { UserData, PageName } from '../types';
+import { treeManager } from '../lib/mlmTree';
 
 interface ManageCustomerPortalProps {
   user: UserData;
@@ -233,7 +234,6 @@ const ManageCustomerPortal = ({ user, onLogout, onSwitchToDashboard }: ManageCus
         }
       `}</style>
       
-      <CartContext.Provider value={{ cartItems: [], wishlistItems: [] }}>
         <Header 
           user={user}
           onLogout={onLogout}
@@ -249,7 +249,6 @@ const ManageCustomerPortal = ({ user, onLogout, onSwitchToDashboard }: ManageCus
           secondaryTitle="Manage Customer Portal"
           onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
         />
-      </CartContext.Provider>
       
       {/* Dashboard Header with Menu */}
       <div className="bg-white shadow-sm border-b border-gray-200">

@@ -1635,7 +1635,6 @@ const CustomerDashboard = ({ user, onLogout, onNavigateToSignup }: CustomerDashb
         }
       `}</style>
       
-      <CartContext.Provider value={{ cartItems: [], wishlistItems: [] }}>
         <Header 
           user={user}
           onLogout={onLogout}
@@ -1652,7 +1651,6 @@ const CustomerDashboard = ({ user, onLogout, onNavigateToSignup }: CustomerDashb
           onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
           onPortalClick={handleSwitchToPortal} // This now switches to manage portal
         />
-      </CartContext.Provider>
       
       {/* Dashboard Header with Menu */}
       <div className="bg-white shadow-sm border-b border-gray-200">
