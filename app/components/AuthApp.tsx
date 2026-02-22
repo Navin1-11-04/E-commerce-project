@@ -12,6 +12,7 @@ import PortalRegistration from './PortalRegistration';
 import { treeManager } from '../lib/mlmTree';
 import type { UserData } from '../types';
 import { CartProvider } from '../context/CartContext'; // ← ADD THIS
+import { loadTreeFromFirestore } from '../lib/treeSync';
 
 import Login from './Login';
 import CustomerRegistration from './CustomerRegistration';
@@ -19,7 +20,7 @@ import BrandOwnerRegistration from './BrandOwnerRegistration';
 import ForgotPassword from './ForgotPassword';
 import TwoFactorAuthSetup from './TwoFactorAuthSetup';
 
-const AuthApp = (): JSX.Element => {
+const AuthApp = () => {
   const pathname = usePathname();
 
   const [currentView, setCurrentView] = useState("login");
@@ -27,6 +28,11 @@ const AuthApp = (): JSX.Element => {
   const [currentUser, setCurrentUser] = useState<UserData | null>(null);
   const [portalId, setPortalId] = useState<string | null>(null);
   const [twoFactorAuthUser, setTwoFactorAuthUser] = useState<UserData | null>(null);
+
+  
+useEffect(() => {
+  loadTreeFromFirestore(); // preload tree on app start
+}, []);
 
   // Check if we're accessing a portal URL
   useEffect(() => {

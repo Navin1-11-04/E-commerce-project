@@ -3,18 +3,28 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, Award } from 'lucide-react';
 import { treeManager } from '../lib/mlmTree';
+import { loadTreeFromFirestore } from '../lib/treeSync'; // ← ADD THIS
 
 const TreeVisualization = ({ onRunConsolidation }: { onRunConsolidation: () => void }): JSX.Element => {
   const [treeData, setTreeData] = useState([]);
   const [expandedLevels, setExpandedLevels] = useState(new Set([0, 1, 2]));
   const [showRepositioningInfo, setShowRepositioningInfo] = useState(true);
+  const [loading, setLoading] = useState(true); // ← ADD THIS
   
   useEffect(() => {
-    refreshTree();
+    // Load from Firestore first, then render
+    loadTreeFromFirestore().then(() => {
+      setTreeData(treeManager.getTreeVisualization());
+      setLoading(false);
+    });
   }, []);
 
   const refreshTree = () => {
-    setTreeData(treeManager.getTreeVisualization());
+    setLoading(true);
+    loadTreeFromFirestore().then(() => {
+      setTreeData(treeManager.getTreeVisualization());
+      setLoading(false);
+    });
   };
 
   const toggleLevel = (level) => {
@@ -45,46 +55,42 @@ const TreeVisualization = ({ onRunConsolidation }: { onRunConsolidation: () => v
     }
   };
 
-  // Calculate reward credits based on turnover
   const calculateRewardCredits = (turnover) => {
     let credits = 0;
     let remainingTurnover = turnover;
     
-    // First slab: ₹200,000 for 10 credits
     if (remainingTurnover > 0) {
       const firstSlab = Math.min(remainingTurnover, 200000);
-      if (firstSlab >= 200000) {
-        credits += 10;
-      }
+      if (firstSlab >= 200000) credits += 10;
       remainingTurnover -= firstSlab;
     }
-    
-    // Second slab: Next ₹500,000 for 15 credits
     if (remainingTurnover > 0) {
       const secondSlab = Math.min(remainingTurnover, 500000);
-      if (secondSlab >= 500000) {
-        credits += 15;
-      }
+      if (secondSlab >= 500000) credits += 15;
       remainingTurnover -= secondSlab;
     }
-    
-    // Third slab: Next ₹1,000,000 for 20 credits
     if (remainingTurnover > 0) {
       const thirdSlab = Math.min(remainingTurnover, 1000000);
-      if (thirdSlab >= 1000000) {
-        credits += 20;
-      }
+      if (thirdSlab >= 1000000) credits += 20;
       remainingTurnover -= thirdSlab;
     }
-    
-    // Fourth slab: Every ₹2,000,000 for 25 credits
     if (remainingTurnover > 0) {
-      const additionalSlabs = Math.floor(remainingTurnover / 2000000);
-      credits += additionalSlabs * 25;
+      credits += Math.floor(remainingTurnover / 2000000) * 25;
     }
-    
     return credits;
   };
+
+  // ── Loading state ────────────────────────────────────────────────────────────
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading tree from database...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4">
@@ -181,9 +187,7 @@ const TreeVisualization = ({ onRunConsolidation }: { onRunConsolidation: () => v
                 {expandedLevels.has(levelIndex) && (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {level.map((user) => {
-                      // Calculate total turnover from both franchises
                       const totalTurnover = user.franchiseATurnover + user.franchiseBTurnover;
-                      // Calculate potential credits based on turnover
                       const potentialCredits = calculateRewardCredits(totalTurnover);
                       
                       return (
@@ -259,7 +263,6 @@ const TreeVisualization = ({ onRunConsolidation }: { onRunConsolidation: () => v
                           )}
                         </div>
                         
-                        {/* --- UPDATED SECTION: Franchise Turnover --- */}
                         <div className="border-t pt-2 mb-2">
                           <div className="text-xs font-semibold mb-1 text-gray-700 flex items-center gap-1">
                             <TrendingUp size={12} /> Franchise Turnover:
@@ -291,7 +294,6 @@ const TreeVisualization = ({ onRunConsolidation }: { onRunConsolidation: () => v
                             📊 Total Sales: ₹{user.totalSales.toFixed(2)}
                           </div>
                           
-                          {/* --- UPDATED SECTION: Reward Credits --- */}
                           <div className="border-t pt-2 mt-2">
                             <div className="text-xs font-semibold text-purple-700 flex items-center gap-1 mb-1">
                               <Award size={12} /> Reward Credits: {user.creditWallet}
@@ -305,7 +307,8 @@ const TreeVisualization = ({ onRunConsolidation }: { onRunConsolidation: () => v
                           </div>
                         </div>
                       </div>
-                      )})}
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -323,7 +326,6 @@ const TreeVisualization = ({ onRunConsolidation }: { onRunConsolidation: () => v
           </ul>
         </div>
 
-        {/* --- UPDATED SECTION: Reward Credits System --- */}
         <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-sm mb-6">
           <div className="font-semibold text-purple-900 mb-2">🏆 Reward Credits System:</div>
           <ul className="space-y-1 text-purple-800">
@@ -338,7 +340,6 @@ const TreeVisualization = ({ onRunConsolidation }: { onRunConsolidation: () => v
             </li>
             <li>✅ <strong>Automatic Allocation:</strong> Credits are automatically calculated and added to your Credit Wallet during the monthly consolidation.</li>
             <li>✅ <strong>Usage:</strong> Credits can be used for purchases on the ecommerce platform (1 Credit = ₹100).</li>
-            <li>✅ <strong>Combined Turnover:</strong> Credits are calculated based on the combined turnover from both Franchise A and Franchise B.</li>
           </ul>
         </div>
 
@@ -348,7 +349,7 @@ const TreeVisualization = ({ onRunConsolidation }: { onRunConsolidation: () => v
             <li>✅ <strong>Customer Greater than Customer:</strong> If a customer earns more than their customer parent, they swap positions.</li>
             <li>✅ <strong>Static Positions:</strong> Founders and Brand Owners cannot be moved and remain in their original positions.</li>
             <li>✅ <strong>Automatic Process:</strong> Restructuring happens automatically after monthly consolidation.</li>
-            <li>✅ <strong>Visual Indicators:</strong> Repositioned nodes are highlighted in orange (currently disabled for stability).</li>
+            <li>✅ <strong>Visual Indicators:</strong> Repositioned nodes are highlighted in orange.</li>
           </ul>
         </div>
       </div>
