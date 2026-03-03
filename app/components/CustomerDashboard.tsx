@@ -12,9 +12,10 @@ interface CustomerDashboardProps {
   onLogout: () => void;
   onNavigateToSignup?: () => void;
   setCurrentPage?: (page: PageName) => void;
+  onNavigate?: (view: string) => void; 
 }
 
-const CustomerDashboard = ({ user, onLogout, onNavigateToSignup }: CustomerDashboardProps): JSX.Element => {
+const CustomerDashboard = ({ user, onLogout, onNavigateToSignup,onNavigate }: CustomerDashboardProps): JSX.Element => {
   const [activeTab, setActiveTab] = useState('profile');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false);
@@ -1647,6 +1648,7 @@ const CustomerDashboard = ({ user, onLogout, onNavigateToSignup }: CustomerDashb
           setCurrentPage={() => {}}
           setShowAuth={() => {}}
           showSecondaryHeader={true}
+          onNavigate={onNavigate}
           secondaryTitle="Customer Dashboard"
           onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
           onPortalClick={handleSwitchToPortal} // This now switches to manage portal

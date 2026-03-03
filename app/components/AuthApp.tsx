@@ -143,9 +143,9 @@ useEffect(() => {
       case "tree":
         return <TreeVisualization key={treeUpdateTrigger} onRunConsolidation={handleTreeUpdate} />;
       case "customerDashboard":
-        return <CustomerDashboard user={currentUser!} onLogout={handleLogout} />;
+        return <CustomerDashboard user={currentUser!} onLogout={handleLogout} onNavigate={setCurrentView}  />;
       case "brandOwnerDashboard":
-        return <BrandOwnerDashboard user={currentUser!} onLogout={handleLogout} />;
+        return <BrandOwnerDashboard user={currentUser!} onLogout={handleLogout} onNavigate={setCurrentView}  />;
       case "managePortal":
         return (
           <ManageCustomerPortal 
