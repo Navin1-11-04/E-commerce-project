@@ -7858,6 +7858,12 @@ function BrandOwnerDashboard({
     }
   };
 
+  const handleSetCurrentPage = (page) => {
+  if (onNavigate) {
+    onNavigate(page);
+  }
+};
+
   return (
     <div className="min-h-screen bg-gray-50">
       <style>{`
@@ -7879,7 +7885,7 @@ function BrandOwnerDashboard({
           setIsCompanyDropdownOpen={setIsCompanyDropdownOpen}
           companyDropdownRef={companyDropdownRef}
            onNavigate={onNavigate}  
-          setCurrentPage={() => {}}
+          setCurrentPage={handleSetCurrentPage}
           setShowAuth={() => {}}
           showSecondaryHeader={true}
           secondaryTitle="Brand Owner Dashboard"

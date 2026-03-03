@@ -58,6 +58,7 @@ const FashionWebApp = (): JSX.Element => {
     else if (userData.userType === 'brand_owner') setCurrentPage('brandOwnerDashboard');
     else setCurrentPage('landing');
   };
+  
 
   const handleLogout = (): void => {
     setCurrentUser(null);
@@ -68,7 +69,7 @@ const FashionWebApp = (): JSX.Element => {
 
   const handleNavigateToSignup = (): void => router.push('/signup');
 
-  const renderPage = (): JSX.Element => {
+  const renderPage = () => {
     if (showAuth) {
       return (
         <AuthApp
@@ -80,17 +81,17 @@ const FashionWebApp = (): JSX.Element => {
       );
     }
 
-    if (currentPage === 'customerDashboard' && userType === 'customer' && currentUser) {
-      return (
-        <CustomerDashboard
-          user={currentUser}
-          onLogout={handleLogout}
-          setCurrentPage={setCurrentPage}
-          onNavigateToSignup={handleNavigateToSignup}
-        />
-      );
-    }
-
+   if (isLoggedIn && userType === 'customer' && currentUser) {
+  return (
+    <CustomerDashboard
+      user={currentUser}
+      onLogout={handleLogout}
+      setCurrentPage={setCurrentPage}
+      onNavigateToSignup={handleNavigateToSignup}
+      currentPage={currentPage}
+    />
+  );
+}
     if (currentPage === 'brandOwnerDashboard' && userType === 'brand_owner') {
       return (
         <BrandOwnerDashboard

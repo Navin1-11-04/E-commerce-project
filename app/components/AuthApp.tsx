@@ -142,10 +142,32 @@ useEffect(() => {
         return <ForgotPassword onBackToLogin={() => setCurrentView("login")} />;
       case "tree":
         return <TreeVisualization key={treeUpdateTrigger} onRunConsolidation={handleTreeUpdate} />;
-      case "customerDashboard":
-        return <CustomerDashboard user={currentUser!} onLogout={handleLogout} onNavigate={setCurrentView}  />;
+     case "customerDashboard":
+  return <CustomerDashboard 
+    user={currentUser!} 
+    onLogout={handleLogout} 
+    onNavigate={(view) => {
+      const ecommercePages = ['all', 'mens', 'womens', 'accessories', 'landing', 'cart', 'wishlist'];
+      if (ecommercePages.includes(view)) {
+        window.location.href = '/';
+      } else {
+        setCurrentView(view);
+      }
+    }}
+  />;
       case "brandOwnerDashboard":
-        return <BrandOwnerDashboard user={currentUser!} onLogout={handleLogout} onNavigate={setCurrentView}  />;
+  return <BrandOwnerDashboard 
+    user={currentUser!} 
+    onLogout={handleLogout} 
+    onNavigate={(view) => {
+      const ecommercePages = ['all', 'mens', 'womens', 'accessories', 'landing', 'cart', 'wishlist'];
+      if (ecommercePages.includes(view)) {
+        window.location.href = '/';
+      } else {
+        setCurrentView(view);
+      }
+    }}
+  />;
       case "managePortal":
         return (
           <ManageCustomerPortal 

@@ -6,16 +6,19 @@ import Header from './Header';
 import Footer from './Footer';
 import { treeManager } from '../lib/mlmTree';
 import type { PageName, UserData } from '../types';
+import CategoryPage from './CategoryPage';
+import ShoppingCartPage from './ShoppingCartPage';
+import WishlistPage from './WishlistPage';
 
 interface CustomerDashboardProps {
   user: UserData;
   onLogout: () => void;
   onNavigateToSignup?: () => void;
   setCurrentPage?: (page: PageName) => void;
-  onNavigate?: (view: string) => void; 
+  currentPage?: PageName;  // ADD THIS, remove onNavigate
 }
 
-const CustomerDashboard = ({ user, onLogout, onNavigateToSignup,onNavigate }: CustomerDashboardProps): JSX.Element => {
+const CustomerDashboard = ({ user, onLogout, onNavigateToSignup, setCurrentPage, currentPage }: CustomerDashboardProps) => {
   const [activeTab, setActiveTab] = useState('profile');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false);
@@ -1625,7 +1628,7 @@ const CustomerDashboard = ({ user, onLogout, onNavigateToSignup,onNavigate }: Cu
         return null;
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-gray-50">
       <style>{`
@@ -1637,23 +1640,23 @@ const CustomerDashboard = ({ user, onLogout, onNavigateToSignup,onNavigate }: Cu
       `}</style>
       
         <Header 
-          user={user}
-          onLogout={onLogout}
-          onProfileClick={() => setShowProfileModal(true)}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          isCompanyDropdownOpen={isCompanyDropdownOpen}
-          setIsCompanyDropdownOpen={setIsCompanyDropdownOpen}
-          companyDropdownRef={companyDropdownRef}
-          setCurrentPage={() => {}}
-          setShowAuth={() => {}}
-          showSecondaryHeader={true}
-          onNavigate={onNavigate}
-          secondaryTitle="Customer Dashboard"
-          onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
-          onPortalClick={handleSwitchToPortal} // This now switches to manage portal
-        />
-      
+  user={user}
+  onLogout={onLogout}
+  onProfileClick={() => setShowProfileModal(true)}
+  searchQuery={searchQuery}
+  setSearchQuery={setSearchQuery}
+  isCompanyDropdownOpen={isCompanyDropdownOpen}
+  setIsCompanyDropdownOpen={setIsCompanyDropdownOpen}
+  companyDropdownRef={companyDropdownRef}
+  setCurrentPage={setCurrentPage || (() => {})}
+  setShowAuth={() => {}}
+  showSecondaryHeader={true}
+  secondaryTitle="Customer Dashboard"
+  onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
+  onPortalClick={handleSwitchToPortal}
+/>
+
+
       {/* Dashboard Header with Menu */}
       <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-8xl mx-auto px-4 py-4">
@@ -1791,8 +1794,17 @@ const CustomerDashboard = ({ user, onLogout, onNavigateToSignup,onNavigate }: Cu
       
       {/* Main Content */}
       <div className="max-w-8xl mx-auto px-4 py-8">
-        {renderTabContent()}
-      </div>
+  {currentPage === 'cart' && (
+    <ShoppingCartPage setCurrentPage={setCurrentPage} onNavigateToSignup={onNavigateToSignup} />
+  )}
+  {currentPage === 'wishlist' && (
+    <WishlistPage setCurrentPage={setCurrentPage} onNavigateToSignup={onNavigateToSignup} />
+  )}
+  {(currentPage === 'mens' || currentPage === 'womens' || currentPage === 'accessories' || currentPage === 'all') && (
+    <CategoryPage category={currentPage} setCurrentPage={setCurrentPage} searchQuery={searchQuery} setSearchQuery={setSearchQuery} onNavigateToSignup={onNavigateToSignup} />
+  )}
+  {(currentPage === 'customerDashboard' || currentPage === 'landing' || !currentPage) && renderTabContent()}
+</div>
       
       {/* Modals */}
       {showAddMoneyModal && renderAddMoneyModal()}
