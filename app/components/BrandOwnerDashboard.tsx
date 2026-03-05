@@ -25,7 +25,6 @@ import {
 } from "lucide-react";
 import { treeManager } from "../lib/mlmTree";
 import ManageTeamPortal from "./ManageTeamPortal";
-import { CartContext } from "../context/CartContext";
 
 interface BrandOwnerDashboardProps {
   setCurrentPage: (page: PageName) => void;
@@ -7857,12 +7856,12 @@ function BrandOwnerDashboard({
         return null;
     }
   };
-
-  const handleSetCurrentPage = (page) => {
-  if (onNavigate) {
-    onNavigate(page);
+const handleSetCurrentPage = (page: PageName) => {
+  if (setCurrentPage) {
+    setCurrentPage(page);
   }
 };
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -7874,25 +7873,22 @@ function BrandOwnerDashboard({
         }
       `}</style>
 
-      <CartContext.Provider value={{ cartItems: [], wishlistItems: [] }}>
         <Header
-          user={user}
-          onLogout={onLogout}
-          onProfileClick={() => setShowProfileModal(true)}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          isCompanyDropdownOpen={isCompanyDropdownOpen}
-          setIsCompanyDropdownOpen={setIsCompanyDropdownOpen}
-          companyDropdownRef={companyDropdownRef}
-           onNavigate={onNavigate}  
-          setCurrentPage={handleSetCurrentPage}
-          setShowAuth={() => {}}
-          showSecondaryHeader={true}
-          secondaryTitle="Brand Owner Dashboard"
-          onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
-          onPortalClick={handlePortalClick}
-        />
-      </CartContext.Provider>
+  user={user}
+  onLogout={onLogout}
+  onProfileClick={() => setShowProfileModal(true)}
+  searchQuery={searchQuery}
+  setSearchQuery={setSearchQuery}
+  isCompanyDropdownOpen={isCompanyDropdownOpen}
+  setIsCompanyDropdownOpen={setIsCompanyDropdownOpen}
+  companyDropdownRef={companyDropdownRef}
+  setCurrentPage={handleSetCurrentPage}  // KEEP ONLY THIS
+  setShowAuth={() => {}}
+  showSecondaryHeader={true}
+  secondaryTitle="Brand Owner Dashboard"
+  onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
+  onPortalClick={handlePortalClick}
+/>
 
       {/* Dashboard Header with Menu */}
       <div className="bg-white shadow-sm border-b border-gray-200">
