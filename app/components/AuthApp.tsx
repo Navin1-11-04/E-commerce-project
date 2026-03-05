@@ -10,7 +10,7 @@ import PortalView from './PortalView';
 import PortalLogin from './PortalLogin';
 import PortalRegistration from './PortalRegistration';
 import { treeManager } from '../lib/mlmTree';
-import type { UserData } from '../types';
+import type { UserData ,PageName} from '../types';
 import { CartProvider } from '../context/CartContext'; // ← ADD THIS
 import { loadTreeFromFirestore } from '../lib/treeSync';
 
@@ -25,6 +25,7 @@ const AuthApp = () => {
 
   const [currentView, setCurrentView] = useState("login");
   const [treeUpdateTrigger, setTreeUpdateTrigger] = useState(0);
+  const [currentPage, setCurrentPage] = useState<PageName>('landing');
   const [currentUser, setCurrentUser] = useState<UserData | null>(null);
   const [portalId, setPortalId] = useState<string | null>(null);
   const [twoFactorAuthUser, setTwoFactorAuthUser] = useState<UserData | null>(null);
@@ -132,6 +133,16 @@ useEffect(() => {
     setCurrentView("login");
   };
 
+   const handleSetCurrentPage = (page: PageName) => {
+    const dashboardViews = ['customerDashboard', 'brandOwnerDashboard', 'managePortal'];
+    // If it's a non-dashboard view string (e.g. 'login'), treat as view switch
+    if (!dashboardViews.includes(page) && Object.keys({ login:1, customer:1, brandOwner:1, tree:1 }).includes(page)) {
+      setCurrentView(page);
+    } else {
+      setCurrentPage(page);
+    }
+  };
+
   const renderCurrentView = (): JSX.Element | null => {
     switch (currentView) {
       case "customer":
@@ -143,31 +154,19 @@ useEffect(() => {
       case "tree":
         return <TreeVisualization key={treeUpdateTrigger} onRunConsolidation={handleTreeUpdate} />;
      case "customerDashboard":
-  return <CustomerDashboard 
-    user={currentUser!} 
-    onLogout={handleLogout} 
-    onNavigate={(view) => {
-      const ecommercePages = ['all', 'mens', 'womens', 'accessories', 'landing', 'cart', 'wishlist'];
-      if (ecommercePages.includes(view)) {
-        window.location.href = '/';
-      } else {
-        setCurrentView(view);
-      }
-    }}
-  />;
+  return <CustomerDashboard
+            user={currentUser!}
+            onLogout={handleLogout}
+            setCurrentPage={handleSetCurrentPage}   // ← was broken before
+            currentPage={currentPage}               // ← was missing before
+          />;
       case "brandOwnerDashboard":
-  return <BrandOwnerDashboard 
-    user={currentUser!} 
-    onLogout={handleLogout} 
-    onNavigate={(view) => {
-      const ecommercePages = ['all', 'mens', 'womens', 'accessories', 'landing', 'cart', 'wishlist'];
-      if (ecommercePages.includes(view)) {
-        window.location.href = '/';
-      } else {
-        setCurrentView(view);
-      }
-    }}
-  />;
+  return <BrandOwnerDashboard
+            user={currentUser!}
+            onLogout={handleLogout}
+            setCurrentPage={handleSetCurrentPage}   // ← pass same handler
+            currentPage={currentPage}
+          />;
       case "managePortal":
         return (
           <ManageCustomerPortal 

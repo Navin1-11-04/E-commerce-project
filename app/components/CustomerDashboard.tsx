@@ -14,8 +14,8 @@ interface CustomerDashboardProps {
   user: UserData;
   onLogout: () => void;
   onNavigateToSignup?: () => void;
-  setCurrentPage?: (page: PageName) => void;
-  currentPage?: PageName;  // ADD THIS, remove onNavigate
+  setCurrentPage?: (page: PageName) => void;  // used by Header for nav links, cart, wishlist
+  currentPage?: PageName;                      // controls which page body renders
 }
 
 const CustomerDashboard = ({ user, onLogout, onNavigateToSignup, setCurrentPage, currentPage }: CustomerDashboardProps) => {
