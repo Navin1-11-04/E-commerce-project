@@ -16,9 +16,10 @@ interface CategoryPageProps {
   searchQuery: string;
   setSearchQuery: (q: string) => void;
   onNavigateToSignup?: () => void;
+  hideHeader?: boolean;
 }
 
-const CategoryPage = ({ category, setCurrentPage, searchQuery, setSearchQuery, onNavigateToSignup }: CategoryPageProps): JSX.Element => {
+const CategoryPage = ({ category, setCurrentPage, searchQuery, setSearchQuery, onNavigateToSignup, hideHeader = false }: CategoryPageProps) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productModalOpen, setProductModalOpen] = useState(false);
   
@@ -284,15 +285,17 @@ const handleAddToWishlist = (product) => {
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
       
-      <Header 
-        setCurrentPage={setCurrentPage} 
-        setShowAuth={setShowAuth} 
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        isCompanyDropdownOpen={isCompanyDropdownOpen}
-        setIsCompanyDropdownOpen={setIsCompanyDropdownOpen}
-        companyDropdownRef={companyDropdownRef}
-      />
+      {!hideHeader && (
+        <Header 
+          setCurrentPage={setCurrentPage} 
+          setShowAuth={setShowAuth} 
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          isCompanyDropdownOpen={isCompanyDropdownOpen}
+          setIsCompanyDropdownOpen={setIsCompanyDropdownOpen}
+          companyDropdownRef={companyDropdownRef}
+        />
+      )}
       
       {/* Category Header */}
       <section className="py-12 bg-gradient-to-br from-gray-50 to-gray-100">

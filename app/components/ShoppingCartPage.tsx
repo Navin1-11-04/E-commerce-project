@@ -11,9 +11,10 @@ import productsData from '../data/products';
 interface ShoppingCartPageProps {
   setCurrentPage: (page: PageName) => void;
   onNavigateToSignup?: () => void;
+  hideHeader?: boolean;
 }
 
-const ShoppingCartPage = ({ setCurrentPage, onNavigateToSignup }: ShoppingCartPageProps)=> {
+const ShoppingCartPage = ({ setCurrentPage, onNavigateToSignup, hideHeader = false }: ShoppingCartPageProps)=> {
   const { 
     cartItems, 
     removeFromCart, 
@@ -103,18 +104,20 @@ const ShoppingCartPage = ({ setCurrentPage, onNavigateToSignup }: ShoppingCartPa
         }
       `}</style>
       
-      <Header 
-        setCurrentPage={setCurrentPage} 
-        setShowAuth={() => {}} 
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        isCompanyDropdownOpen={isCompanyDropdownOpen}
-        setIsCompanyDropdownOpen={setIsCompanyDropdownOpen}
-        companyDropdownRef={companyDropdownRef}
-        showSecondaryHeader={true}
-        secondaryTitle="Shopping Cart"
-        onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
-      />
+      {!hideHeader && (
+        <Header 
+          setCurrentPage={setCurrentPage} 
+          setShowAuth={() => {}} 
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          isCompanyDropdownOpen={isCompanyDropdownOpen}
+          setIsCompanyDropdownOpen={setIsCompanyDropdownOpen}
+          companyDropdownRef={companyDropdownRef}
+          showSecondaryHeader={true}
+          secondaryTitle="Shopping Cart"
+          onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
+        />
+      )}
       
       {/* Menu Dropdown */}
       {isMenuOpen && (

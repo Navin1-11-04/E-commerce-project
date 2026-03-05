@@ -1794,17 +1794,17 @@ const CustomerDashboard = ({ user, onLogout, onNavigateToSignup, setCurrentPage,
       
       {/* Main Content */}
       <div className="max-w-8xl mx-auto px-4 py-8">
-  {currentPage === 'cart' && (
-    <ShoppingCartPage setCurrentPage={setCurrentPage} onNavigateToSignup={onNavigateToSignup} />
-  )}
-  {currentPage === 'wishlist' && (
-    <WishlistPage setCurrentPage={setCurrentPage} onNavigateToSignup={onNavigateToSignup} />
-  )}
-  {(currentPage === 'mens' || currentPage === 'womens' || currentPage === 'accessories' || currentPage === 'all') && (
-    <CategoryPage category={currentPage} setCurrentPage={setCurrentPage} searchQuery={searchQuery} setSearchQuery={setSearchQuery} onNavigateToSignup={onNavigateToSignup} />
-  )}
-  {(currentPage === 'customerDashboard' || currentPage === 'landing' || !currentPage) && renderTabContent()}
-</div>
+        {currentPage === 'cart' && (
+          <ShoppingCartPage setCurrentPage={setCurrentPage} onNavigateToSignup={onNavigateToSignup} hideHeader={true} />
+        )}
+        {currentPage === 'wishlist' && (
+          <WishlistPage setCurrentPage={setCurrentPage} onNavigateToSignup={onNavigateToSignup} hideHeader={true} />
+        )}
+        {(currentPage === 'mens' || currentPage === 'womens' || currentPage === 'accessories' || currentPage === 'all') && (
+          <CategoryPage category={currentPage} setCurrentPage={setCurrentPage} searchQuery={searchQuery} setSearchQuery={setSearchQuery} onNavigateToSignup={onNavigateToSignup} hideHeader={true} />
+        )}
+        {(currentPage === 'customerDashboard' || currentPage === 'landing' || !currentPage) && renderTabContent()}
+      </div>
       
       {/* Modals */}
       {showAddMoneyModal && renderAddMoneyModal()}

@@ -10,11 +10,13 @@ import Footer from "./Footer";
 interface WishlistPageProps {
   setCurrentPage: (page: PageName) => void;
   onNavigateToSignup?: () => void;
+  hideHeader?: boolean;
 }
 
 const WishlistPage = ({
   setCurrentPage,
   onNavigateToSignup,
+  hideHeader = false,
 }: WishlistPageProps): JSX.Element => {
   const { wishlistItems, removeFromWishlist, moveToCart } =
     React.useContext(CartContext);
@@ -90,17 +92,19 @@ const WishlistPage = ({
         }
       `}</style>
 
-      <Header
-        setCurrentPage={setCurrentPage}
-        setShowAuth={() => {}}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        isCompanyDropdownOpen={isCompanyDropdownOpen}
-        setIsCompanyDropdownOpen={setIsCompanyDropdownOpen}
-        companyDropdownRef={companyDropdownRef}
-        showSecondaryHeader={true}
-        secondaryTitle="My Wishlist"
-      />
+      {!hideHeader && (
+        <Header
+          setCurrentPage={setCurrentPage}
+          setShowAuth={() => {}}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          isCompanyDropdownOpen={isCompanyDropdownOpen}
+          setIsCompanyDropdownOpen={setIsCompanyDropdownOpen}
+          companyDropdownRef={companyDropdownRef}
+          showSecondaryHeader={true}
+          secondaryTitle="My Wishlist"
+        />
+      )}
 
       <div className="max-w-8xl mx-auto px-4 py-8">
         {wishlistItems.length === 0 ? (
