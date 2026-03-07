@@ -15,6 +15,7 @@ interface LandingPageProps {
   setIsLoggedIn?: (v: boolean) => void;
   setShowAuth?: (v: boolean) => void;
   onNavigateToSignup?: () => void;
+  hideHeader?: boolean; // Added prop to hide header/footer when embedded
 }
 
 const LandingPage = ({
@@ -23,6 +24,7 @@ const LandingPage = ({
   setIsLoggedIn,
   setShowAuth,
   onNavigateToSignup,
+  hideHeader = false, // Default to false
 }: LandingPageProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false);
@@ -129,16 +131,19 @@ const LandingPage = ({
         }
       `}</style>
 
-      <Header
-        setCurrentPage={setCurrentPage}
-        setShowAuth={setShowAuth}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        isCompanyDropdownOpen={isCompanyDropdownOpen}
-        setIsCompanyDropdownOpen={setIsCompanyDropdownOpen}
-        companyDropdownRef={companyDropdownRef}
-        onNavigateToSignup={onNavigateToSignup}
-      />
+      {/* Conditionally render Header */}
+      {!hideHeader && (
+        <Header
+          setCurrentPage={setCurrentPage}
+          setShowAuth={setShowAuth}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          isCompanyDropdownOpen={isCompanyDropdownOpen}
+          setIsCompanyDropdownOpen={setIsCompanyDropdownOpen}
+          companyDropdownRef={companyDropdownRef}
+          onNavigateToSignup={onNavigateToSignup}
+        />
+      )}
 
       {/* Hero Section with Video */}
       <section className="relative py-12 px-4 sm:px-6 lg:px-8">
@@ -965,8 +970,8 @@ const LandingPage = ({
         </div>
       </section>
 
-      {/* Footer */}
-      <Footer />
+      {/* Conditionally render Footer */}
+      {!hideHeader && <Footer />}
 
       {/* Product Details Modal Revome this - /60 backdrop-blur-sm transition-opacity */}
       {productModalOpen && selectedProduct && (

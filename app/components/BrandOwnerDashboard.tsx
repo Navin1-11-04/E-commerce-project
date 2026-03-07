@@ -25,19 +25,23 @@ import {
 } from "lucide-react";
 import { treeManager } from "../lib/mlmTree";
 import ManageTeamPortal from "./ManageTeamPortal";
+import CategoryPage from './CategoryPage';
+import ShoppingCartPage from './ShoppingCartPage';
+import WishlistPage from './WishlistPage';
 
 interface BrandOwnerDashboardProps {
   setCurrentPage: (page: PageName) => void;
+  currentPage?: PageName;
   onNavigateToSignup?: () => void;
   user?: UserData | null;
   onLogout?: () => void;
   onNavigate?: (view: string) => void;
 }
-
 // Brand Owner Dashboard Component
 function BrandOwnerDashboard({
   setCurrentPage,
   onNavigateToSignup,
+  currentPage,
   user,
   onLogout,
   onNavigate
@@ -7872,8 +7876,7 @@ const handleSetCurrentPage = (page: PageName) => {
           font-family: 'Assistant', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
         }
       `}</style>
-
-        <Header
+<Header 
   user={user}
   onLogout={onLogout}
   onProfileClick={() => setShowProfileModal(true)}
@@ -8053,7 +8056,18 @@ const handleSetCurrentPage = (page: PageName) => {
       )}
 
       {/* Main Content */}
-      <div className="max-w-8xl mx-auto px-4 py-8">{renderTabContent()}</div>
+      <div className="max-w-8xl mx-auto px-4 py-8">
+        {currentPage === 'cart' && (
+          <ShoppingCartPage setCurrentPage={setCurrentPage} onNavigateToSignup={onNavigateToSignup} hideHeader={true} />
+        )}
+        {currentPage === 'wishlist' && (
+          <WishlistPage setCurrentPage={setCurrentPage} onNavigateToSignup={onNavigateToSignup} hideHeader={true} />
+        )}
+        {(currentPage === 'mens' || currentPage === 'womens' || currentPage === 'accessories' || currentPage === 'all') && (
+          <CategoryPage category={currentPage} setCurrentPage={setCurrentPage} searchQuery={searchQuery} setSearchQuery={setSearchQuery} onNavigateToSignup={onNavigateToSignup} hideHeader={true} />
+        )}
+        {(currentPage === 'customerDashboard' || currentPage === 'landing' || !currentPage) && renderTabContent()}
+      </div>
 
       {/* Profile Modal */}
       {showProfileModal && (

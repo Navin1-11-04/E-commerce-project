@@ -92,16 +92,17 @@ const FashionWebApp = (): JSX.Element => {
     />
   );
 }
-    if (currentPage === 'brandOwnerDashboard' && userType === 'brand_owner') {
-      return (
-        <BrandOwnerDashboard
-          setCurrentPage={setCurrentPage}
-          user={currentUser}
-          onNavigateToSignup={handleNavigateToSignup}
-        />
-      );
-    }
-
+    if (userType === 'brand_owner' && currentUser) {
+  return (
+    <BrandOwnerDashboard
+      setCurrentPage={setCurrentPage}
+      currentPage={currentPage}
+      user={currentUser}
+      onLogout={handleLogout}
+      onNavigateToSignup={handleNavigateToSignup}
+    />
+  );
+}
     if (currentPage === 'tree') {
       return <TreeVisualization onRunConsolidation={() => {}} />;
     }
