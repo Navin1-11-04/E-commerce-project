@@ -25,9 +25,9 @@ import {
 } from "lucide-react";
 import { treeManager } from "../lib/mlmTree";
 import ManageTeamPortal from "./ManageTeamPortal";
-import CategoryPage from './CategoryPage';
-import ShoppingCartPage from './ShoppingCartPage';
-import WishlistPage from './WishlistPage';
+import CategoryPage from "./CategoryPage";
+import ShoppingCartPage from "./ShoppingCartPage";
+import WishlistPage from "./WishlistPage";
 
 interface BrandOwnerDashboardProps {
   setCurrentPage: (page: PageName) => void;
@@ -44,7 +44,7 @@ function BrandOwnerDashboard({
   currentPage,
   user,
   onLogout,
-  onNavigate
+  onNavigate,
 }: BrandOwnerDashboardProps) {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [showTeamPortal, setShowTeamPortal] = useState(false);
@@ -1219,7 +1219,7 @@ function BrandOwnerDashboard({
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <button
                 onClick={() => setActiveTab("products")}
-                className="p-4 bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-lg hover:from-orange-500 hover:to-orange-600 transition-all shadow-md"
+                className="p-4 bg-linear-to-r from-orange-400 to-orange-500 text-white rounded-lg hover:from-orange-500 hover:to-orange-600 transition-all shadow-md"
               >
                 <div className="text-lg font-semibold">Manage Products</div>
                 <div className="text-sm opacity-90 mt-1">
@@ -1228,7 +1228,7 @@ function BrandOwnerDashboard({
               </button>
               <button
                 onClick={() => setActiveTab("team")}
-                className="p-4 bg-gradient-to-r from-slate-500 to-slate-600 text-white rounded-lg hover:from-slate-600 hover:to-slate-700 transition-all shadow-md"
+                className="p-4 bg-linear-to-r from-slate-500 to-slate-600 text-white rounded-lg hover:from-slate-600 hover:to-slate-700 transition-all shadow-md"
               >
                 <div className="text-lg font-semibold">Manage Team Members</div>
                 <div className="text-sm opacity-90 mt-1">
@@ -1237,7 +1237,7 @@ function BrandOwnerDashboard({
               </button>
               <button
                 onClick={() => setActiveTab("ewallet")}
-                className="p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-md"
+                className="p-4 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-md"
               >
                 <div className="text-lg font-semibold">E-Wallet</div>
                 <div className="text-sm opacity-90 mt-1">
@@ -1246,14 +1246,23 @@ function BrandOwnerDashboard({
               </button>
               <button
                 onClick={() => setActiveTab("incomewallet")}
-                className="p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-md"
+                className="p-4 bg-linear-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-md"
               >
                 <div className="text-lg font-semibold">Income Wallet</div>
                 <div className="text-sm opacity-90 mt-1">Withdraw earnings</div>
               </button>
               <button
+                onClick={() => setActiveTab("bank")}
+                className="p-4 bg-linear-to-r from-blue-500 to-teal-500 text-white rounded-lg hover:from-blue-600 hover:to-teal-600 transition-all shadow-md"
+              >
+                <div className="text-lg font-semibold">Bank Account Verification</div>
+                <div className="text-sm opacity-90 mt-1">
+                  Verify your bank details
+                </div>
+              </button>
+              <button
                 onClick={() => setActiveTab("kyc")}
-                className="p-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all shadow-md"
+                className="p-4 bg-linear-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all shadow-md"
               >
                 <div className="text-lg font-semibold">KYC Verification</div>
                 <div className="text-sm opacity-90 mt-1">
@@ -7856,16 +7865,598 @@ function BrandOwnerDashboard({
           </div>
         );
 
+      case 'creditwallet':
+        return (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-2xl font-bold mb-6">Credit Wallet</h2>
+            
+            {/* Credit Wallet Balance Card */}
+            <div className="mb-8 p-4 bg-purple-50 rounded-lg">
+              <div className="bg-white p-6 rounded-lg shadow">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="text-sm text-gray-500 mb-1">Available Credits</div>
+                    <div className="text-3xl font-bold text-purple-600">{financialData.creditWallet}</div>
+                    <div className="text-xs text-gray-500 mt-1">Reward Credits earned from franchise performance</div>
+                  </div>
+                  <div className="bg-purple-100 rounded-full p-3">
+                    <Award size={24} className="text-purple-600" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Franchise Performance */}
+            <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-4 border border-gray-200 rounded-lg">
+                <h3 className="text-lg font-semibold mb-4 text-blue-600">Franchise A (Left Side)</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Current Turnover:</span>
+                    <span className="font-medium">₹{financialData.franchiseATurnover.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Credits Earned:</span>
+                    <span className="font-medium">{calculateRewardCredits(financialData.franchiseATurnover)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Next Threshold:</span>
+                    <span className="font-medium">
+                      {financialData.franchiseATurnover < 200000 
+                        ? `₹${(200000 - financialData.franchiseATurnover).toLocaleString()} to reach 10 credits`
+                        : financialData.franchiseATurnover < 700000
+                        ? `₹${(700000 - financialData.franchiseATurnover).toLocaleString()} to reach 25 credits`
+                        : financialData.franchiseATurnover < 1700000
+                        ? `₹${(1700000 - financialData.franchiseATurnover).toLocaleString()} to reach 45 credits`
+                        : `₹${(Math.ceil(financialData.franchiseATurnover / 2000000) * 2000000 - financialData.franchiseATurnover).toLocaleString()} to reach next level`
+                      }
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="p-4 border border-gray-200 rounded-lg">
+                <h3 className="text-lg font-semibold mb-4 text-blue-600">Franchise B (Right Side)</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Current Turnover:</span>
+                    <span className="font-medium">₹{financialData.franchiseBTurnover.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Credits Earned:</span>
+                    <span className="font-medium">{calculateRewardCredits(financialData.franchiseBTurnover)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Next Threshold:</span>
+                    <span className="font-medium">
+                      {financialData.franchiseBTurnover < 200000 
+                        ? `₹${(200000 - financialData.franchiseBTurnover).toLocaleString()} to reach 10 credits`
+                        : financialData.franchiseBTurnover < 700000
+                        ? `₹${(700000 - financialData.franchiseBTurnover).toLocaleString()} to reach 25 credits`
+                        : financialData.franchiseBTurnover < 1700000
+                        ? `₹${(1700000 - financialData.franchiseBTurnover).toLocaleString()} to reach 45 credits`
+                        : `₹${(Math.ceil(financialData.franchiseBTurnover / 2000000) * 2000000 - financialData.franchiseBTurnover).toLocaleString()} to reach next level`
+                      }
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Reward Structure Information */}
+            <div className="mb-8 p-4 bg-gray-50 rounded-lg">
+              <h3 className="text-lg font-semibold mb-4">Reward Structure</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-600">First ₹200,000 turnover:</span>
+                  <span className="font-medium">10 Reward Credits</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Next ₹500,000 turnover:</span>
+                  <span className="font-medium">15 Reward Credits</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Next ₹1,000,000 turnover:</span>
+                  <span className="font-medium">20 Reward Credits</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Every additional ₹2,000,000:</span>
+                  <span className="font-medium">25 Reward Credits</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Credit History */}
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Credit History</h3>
+                <button 
+                  onClick={() => setShowCreditDetails(!showCreditDetails)}
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  {showCreditDetails ? 'Hide Details' : 'Show Details'}
+                </button>
+              </div>
+              
+              {creditHistory.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Date
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Franchise
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Turnover
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Credits Earned
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Total Credits
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {creditHistory.map((credit, index) => (
+                        <tr key={index}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {credit.date}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {credit.franchise}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            ₹{credit.turnover.toLocaleString()}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-purple-600">
+                            +{credit.creditsEarned}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-purple-600">
+                            {credit.totalCredits}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <p className="text-center text-gray-500">No credit history found</p>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+                    turnover to earn credits!
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Credit Tiers Information */}
+            <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 className="font-semibold text-gray-800 mb-4">
+                🏆 Credit Earning Tiers
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white p-4 rounded-lg border-l-4 border-blue-500">
+                  <div className="text-sm text-gray-600 mb-1">
+                    First ₹200,000
+                  </div>
+                  <div className="text-2xl font-bold text-blue-600">
+                    10 Credits
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg border-l-4 border-green-500">
+                  <div className="text-sm text-gray-600 mb-1">
+                    Next ₹500,000
+                  </div>
+                  <div className="text-2xl font-bold text-green-600">
+                    15 Credits
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg border-l-4 border-purple-500">
+                  <div className="text-sm text-gray-600 mb-1">
+                    Next ₹1,000,000
+                  </div>
+                  <div className="text-2xl font-bold text-purple-600">
+                    20 Credits
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg border-l-4 border-yellow-500">
+                  <div className="text-sm text-gray-600 mb-1">
+                    Every ₹2,000,000+
+                  </div>
+                  <div className="text-2xl font-bold text-yellow-600">
+                    25 Credits
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'franchiseA':
+        return (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-2xl font-bold mb-6">Franchise A (Left Team)</h2>
+            {franchiseA ? (
+              <div>
+                <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">Current Turnover</div>
+                      <div className="text-xl font-bold text-blue-600">₹{financialData.franchiseATurnover.toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">Credits Earned</div>
+                      <div className="text-xl font-bold text-purple-600">{calculateRewardCredits(financialData.franchiseATurnover)}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">Next Threshold</div>
+                      <div className="text-sm font-medium">
+                        {financialData.franchiseATurnover < 200000 
+                          ? `₹${(200000 - financialData.franchiseATurnover).toLocaleString()}`
+                          : financialData.franchiseATurnover < 700000
+                          ? `₹${(700000 - financialData.franchiseATurnover).toLocaleString()}`
+                          : financialData.franchiseATurnover < 1700000
+                          ? `₹${(1700000 - financialData.franchiseATurnover).toLocaleString()}`
+                          : `₹${(Math.ceil(financialData.franchiseATurnover / 2000000) * 2000000 - financialData.franchiseATurnover).toLocaleString()}`
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          S.No
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          User ID
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          User Name
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Date of Joining
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          KYC Status
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Purchase Value
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {franchiseA.direct ? (
+                        <tr>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{franchiseA.direct.id}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{franchiseA.direct.name}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{franchiseA.direct.joinDate}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              franchiseA.direct.kycVerified 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              {franchiseA.direct.kycVerified ? 'Verified' : 'Not Verified'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{franchiseA.direct.purchaseValue || 0}</td>
+                        </tr>
+                      ) : (
+                        <tr>
+                          <td colSpan="6" className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                            No direct referral in Franchise A
+                          </td>
+                        </tr>
+                      )}
+                      {franchiseA.grandchildren.map((child, index) => (
+                        <tr key={child.id}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{index + 2}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{child.id}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{child.name}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{child.joinDate}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              child.kycVerified 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              {child.kycVerified ? 'Verified' : 'Not Verified'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{child.purchaseValue || 0}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                <p className="text-center text-gray-500">No data available for Franchise A</p>
+              </div>
+            )}
+          </div>
+        );
+        
+      case 'franchiseB':
+        return (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-2xl font-bold mb-6">Franchise B (Right Team)</h2>
+            {franchiseB ? (
+              <div>
+                <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">Current Turnover</div>
+                      <div className="text-xl font-bold text-blue-600">₹{financialData.franchiseBTurnover.toLocaleString()}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">Credits Earned</div>
+                      <div className="text-xl font-bold text-purple-600">{calculateRewardCredits(financialData.franchiseBTurnover)}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">Next Threshold</div>
+                      <div className="text-sm font-medium">
+                        {financialData.franchiseBTurnover < 200000 
+                          ? `₹${(200000 - financialData.franchiseBTurnover).toLocaleString()}`
+                          : financialData.franchiseBTurnover < 700000
+                          ? `₹${(700000 - financialData.franchiseBTurnover).toLocaleString()}`
+                          : financialData.franchiseBTurnover < 1700000
+                          ? `₹${(1700000 - financialData.franchiseBTurnover).toLocaleString()}`
+                          : `₹${(Math.ceil(financialData.franchiseBTurnover / 2000000) * 2000000 - financialData.franchiseBTurnover).toLocaleString()}`
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          S.No
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          User ID
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          User Name
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Date of Joining
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          KYC Status
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Purchase Value
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {franchiseB.direct ? (
+                        <tr>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{franchiseB.direct.id}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{franchiseB.direct.name}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{franchiseB.direct.joinDate}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              franchiseB.direct.kycVerified 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              {franchiseB.direct.kycVerified ? 'Verified' : 'Not Verified'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{franchiseB.direct.purchaseValue || 0}</td>
+                        </tr>
+                      ) : (
+                        <tr>
+                          <td colSpan="6" className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                            No direct referral in Franchise B
+                          </td>
+                        </tr>
+                      )}
+                      {franchiseB.grandchildren.map((child, index) => (
+                        <tr key={child.id}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{index + 2}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{child.id}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{child.name}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{child.joinDate}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              child.kycVerified 
+                                ? 'bg-green-100 text-green-800' 
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              {child.kycVerified ? 'Verified' : 'Not Verified'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{child.purchaseValue || 0}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                <p className="text-center text-gray-500">No data available for Franchise B</p>
+              </div>
+            )}
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="text-2xl font-bold text-blue-600 mb-1">
+                      Franchise A
+                    </h3>
+                    <p className="text-sm text-gray-600">Left Side Turnover</p>
+                  </div>
+                  <div className="text-3xl">🏢</div>
+                </div>
+                <div className="bg-white p-4 rounded-lg mb-4">
+                  <div className="text-sm text-gray-600 mb-1">
+                    Total Turnover
+                  </div>
+                  <div className="text-3xl font-bold text-blue-600">
+                    ₹
+                    {(
+                      financialData.franchiseAPurchaseValue || 0
+                    ).toLocaleString()}
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg">
+                  <div className="text-sm text-gray-600 mb-1">
+                    Franchise A Earned Turnover
+                  </div>
+                  <div className="text-2xl font-bold text-indigo-600">
+                    ₹{(financialData.franchiseATurnover || 0).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+
+              {/* Franchise B */}
+              <div className="p-6 bg-linear-to-br from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="text-2xl font-bold text-green-600 mb-1">
+                      Franchise B
+                    </h3>
+                    <p className="text-sm text-gray-600">Right Side Turnover</p>
+                  </div>
+                  <div className="text-3xl">🏢</div>
+                </div>
+                <div className="bg-white p-4 rounded-lg mb-4">
+                  <div className="text-sm text-gray-600 mb-1">
+                    Total Turnover
+                  </div>
+                  <div className="text-3xl font-bold text-green-600">
+                    ₹
+                    {(
+                      financialData.franchiseBPurchaseValue || 0
+                    ).toLocaleString()}
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg">
+                  <div className="text-sm text-gray-600 mb-1">
+                    Franchise B Earned Turnover
+                  </div>
+                  <div className="text-2xl font-bold text-emerald-600">
+                    ₹{(financialData.franchiseBTurnover || 0).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Combined Metrics */}
+            <div className="bg-linear-to-r from-purple-50 to-pink-50 p-6 rounded-lg border border-purple-200 mb-8">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                Combined Franchise Metrics
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white p-4 rounded-lg">
+                  <div className="text-sm text-gray-600 mb-1">
+                    Total Franchise Turnover
+                  </div>
+                  <div className="text-2xl font-bold text-purple-600">
+                    ₹
+                    {(
+                      (financialData.franchiseATurnover || 0) +
+                      (financialData.franchiseBTurnover || 0)
+                    ).toLocaleString()}
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg">
+                  <div className="text-sm text-gray-600 mb-1">
+                    Balanced Volume
+                  </div>
+                  <div className="text-2xl font-bold text-pink-600">
+                    ₹
+                    {Math.min(
+                      financialData.franchiseATurnover || 0,
+                      financialData.franchiseBTurnover || 0,
+                    ).toLocaleString()}
+                  </div>
+                </div>
+                <div className="bg-white p-4 rounded-lg">
+                  <div className="text-sm text-gray-600 mb-1">
+                    Carry Forward Volume
+                  </div>
+                  <div className="text-2xl font-bold text-indigo-600">
+                    ₹
+                    {Math.abs(
+                      (financialData.franchiseATurnover || 0) -
+                        (financialData.franchiseBTurnover || 0),
+                    ).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Franchise Details */}
+            <div className="bg-gray-50 p-6 rounded-lg">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                📊 Franchise Structure
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+                  <span className="text-gray-700">
+                    Franchise A Direct Children
+                  </span>
+                  <span className="font-semibold text-blue-600">
+                    {userData?.left ? 1 : 0} child
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+                  <span className="text-gray-700">
+                    Franchise B Direct Children
+                  </span>
+                  <span className="font-semibold text-green-600">
+                    {userData?.right ? 1 : 0} child
+                  </span>
+                </div>
+                <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+                  <span className="text-gray-700">
+                    Franchise A Income (5% of balanced volume)
+                  </span>
+                  <span className="font-semibold text-indigo-600">
+                    ₹
+                    {(
+                      Math.min(
+                        financialData.franchiseATurnover || 0,
+                        financialData.franchiseBTurnover || 0,
+                      ) * 0.05 || 0
+                    ).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
       default:
         return null;
     }
   };
-const handleSetCurrentPage = (page: PageName) => {
-  if (setCurrentPage) {
-    setCurrentPage(page);
-  }
-};
-
+  const handleSetCurrentPage = (page: PageName) => {
+    if (setCurrentPage) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -7876,22 +8467,22 @@ const handleSetCurrentPage = (page: PageName) => {
           font-family: 'Assistant', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
         }
       `}</style>
-<Header 
-  user={user}
-  onLogout={onLogout}
-  onProfileClick={() => setShowProfileModal(true)}
-  searchQuery={searchQuery}
-  setSearchQuery={setSearchQuery}
-  isCompanyDropdownOpen={isCompanyDropdownOpen}
-  setIsCompanyDropdownOpen={setIsCompanyDropdownOpen}
-  companyDropdownRef={companyDropdownRef}
-  setCurrentPage={handleSetCurrentPage}  // KEEP ONLY THIS
-  setShowAuth={() => {}}
-  showSecondaryHeader={true}
-  secondaryTitle="Brand Owner Dashboard"
-  onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
-  onPortalClick={handlePortalClick}
-/>
+      <Header
+        user={user}
+        onLogout={onLogout}
+        onProfileClick={() => setShowProfileModal(true)}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        isCompanyDropdownOpen={isCompanyDropdownOpen}
+        setIsCompanyDropdownOpen={setIsCompanyDropdownOpen}
+        companyDropdownRef={companyDropdownRef}
+        setCurrentPage={handleSetCurrentPage} // KEEP ONLY THIS
+        setShowAuth={() => {}}
+        showSecondaryHeader={true}
+        secondaryTitle="Brand Owner Dashboard"
+        onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
+        onPortalClick={handlePortalClick}
+      />
 
       {/* Dashboard Header with Menu */}
       <div className="bg-white shadow-sm border-b border-gray-200">
@@ -8050,6 +8641,46 @@ const handleSetCurrentPage = (page: PageName) => {
               >
                 Add Bank Account
               </button>
+              <div className="border-t my-2"></div>
+              <button
+                onClick={() => {
+                  setActiveTab("creditwallet");
+                  setIsMenuOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2 text-sm font-medium ${
+                  activeTab === "creditwallet"
+                    ? "bg-purple-100 text-purple-700 border-r-4 border-purple-700"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                Credit Wallet
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab("franchiseA");
+                  setIsMenuOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2 text-sm font-medium ${
+                  activeTab === "franchiseA"
+                    ? "bg-blue-100 text-blue-700 border-r-4 border-blue-700"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                Franchise A (Left Team)
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab("franchiseB");
+                  setIsMenuOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2 text-sm font-medium ${
+                  activeTab === "franchiseB"
+                    ? "bg-blue-100 text-blue-700 border-r-4 border-blue-700"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                Franchise B (Right Team)
+              </button>
             </div>
           </div>
         </div>
@@ -8057,16 +8688,37 @@ const handleSetCurrentPage = (page: PageName) => {
 
       {/* Main Content */}
       <div className="max-w-8xl mx-auto px-4 py-8">
-        {currentPage === 'cart' && (
-          <ShoppingCartPage setCurrentPage={setCurrentPage} onNavigateToSignup={onNavigateToSignup} hideHeader={true} />
+        {currentPage === "cart" && (
+          <ShoppingCartPage
+            setCurrentPage={setCurrentPage}
+            onNavigateToSignup={onNavigateToSignup}
+            hideHeader={true}
+          />
         )}
-        {currentPage === 'wishlist' && (
-          <WishlistPage setCurrentPage={setCurrentPage} onNavigateToSignup={onNavigateToSignup} hideHeader={true} />
+        {currentPage === "wishlist" && (
+          <WishlistPage
+            setCurrentPage={setCurrentPage}
+            onNavigateToSignup={onNavigateToSignup}
+            hideHeader={true}
+          />
         )}
-        {(currentPage === 'mens' || currentPage === 'womens' || currentPage === 'accessories' || currentPage === 'all') && (
-          <CategoryPage category={currentPage} setCurrentPage={setCurrentPage} searchQuery={searchQuery} setSearchQuery={setSearchQuery} onNavigateToSignup={onNavigateToSignup} hideHeader={true} />
+        {(currentPage === "mens" ||
+          currentPage === "womens" ||
+          currentPage === "accessories" ||
+          currentPage === "all") && (
+          <CategoryPage
+            category={currentPage}
+            setCurrentPage={setCurrentPage}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onNavigateToSignup={onNavigateToSignup}
+            hideHeader={true}
+          />
         )}
-        {(currentPage === 'customerDashboard' || currentPage === 'landing' || !currentPage) && renderTabContent()}
+        {(currentPage === "customerDashboard" ||
+          currentPage === "landing" ||
+          !currentPage) &&
+          renderTabContent()}
       </div>
 
       {/* Profile Modal */}
