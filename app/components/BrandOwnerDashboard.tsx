@@ -22,12 +22,30 @@ import {
   Copy,
   Wallet,
   Menu,
+  User,
+  Lock,
+  Shield,
+  Coins,
+  Trophy,
+  Instagram,
+  ChevronDown,
+  ChevronUp,
+  ChevronRight,
+  Store,
+  Tag,
+  Settings,
+  MessageSquare,
+  LogOut,
+  Award,
 } from "lucide-react";
 import { treeManager } from "../lib/mlmTree";
 import ManageTeamPortal from "./ManageTeamPortal";
 import CategoryPage from "./CategoryPage";
 import ShoppingCartPage from "./ShoppingCartPage";
 import WishlistPage from "./WishlistPage";
+import CreateInvoice from "./CreateInvoice";
+import CouponManagement from "./CouponManagement";
+import ManageBusiness from "./ManageBusiness";
 
 interface BrandOwnerDashboardProps {
   setCurrentPage: (page: PageName) => void;
@@ -51,6 +69,7 @@ function BrandOwnerDashboard({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [kycData, setKycData] = useState({
@@ -194,6 +213,56 @@ function BrandOwnerDashboard({
   const [lowStockAlerts, setLowStockAlerts] = useState([]);
   const [syncing, setSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState(null);
+
+  // New Menu Drawer State Variables
+  const [activeMenuSection, setActiveMenuSection] = useState(null);
+  const [show2FAModal, setShow2FAModal] = useState(false);
+  const [showPhoneVerification, setShowPhoneVerification] = useState(false);
+  const [showChangePhoneModal, setShowChangePhoneModal] = useState(false);
+  const [showSkip2FAModal, setShowSkip2FAModal] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
+
+  // Profile Form States
+  const [userAvatar, setUserAvatar] = useState(null);
+  const [userName, setUserName] = useState(user?.name || "");
+  const [userMobile, setUserMobile] = useState(user?.mobile || "");
+  const [userEmail, setUserEmail] = useState(user?.email || "");
+
+  // Security States
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  // 2FA States
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [codeSent, setCodeSent] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+
+  // Feedback Form States
+  const [ratings, setRatings] = useState({
+    easeOfUse: 0,
+    features: 0,
+    performance: 0,
+    customerSupport: 0,
+    valueForMoney: 0,
+    overallExperience: 0,
+  });
+  const [recommendationRating, setRecommendationRating] = useState(0);
+  const [feedbackText, setFeedbackText] = useState("");
+
+  // Notification Settings
+  const [notificationSettings, setNotificationSettings] = useState({
+    orderUpdates: true,
+    promotions: true,
+    newsletter: true,
+    accountAlerts: true,
+    recommendations: true,
+  });
+
+  // Invoice Modal State
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
 
   const companyDropdownRef = React.useRef(null);
 
@@ -1219,7 +1288,7 @@ function BrandOwnerDashboard({
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <button
                 onClick={() => setActiveTab("products")}
-                className="p-4 bg-linear-to-r from-orange-400 to-orange-500 text-white rounded-lg hover:from-orange-500 hover:to-orange-600 transition-all shadow-md"
+                className="p-4 bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-lg hover:from-orange-500 hover:to-orange-600 transition-all shadow-md"
               >
                 <div className="text-lg font-semibold">Manage Products</div>
                 <div className="text-sm opacity-90 mt-1">
@@ -1228,7 +1297,7 @@ function BrandOwnerDashboard({
               </button>
               <button
                 onClick={() => setActiveTab("team")}
-                className="p-4 bg-linear-to-r from-slate-500 to-slate-600 text-white rounded-lg hover:from-slate-600 hover:to-slate-700 transition-all shadow-md"
+                className="p-4 bg-gradient-to-r from-slate-500 to-slate-600 text-white rounded-lg hover:from-slate-600 hover:to-slate-700 transition-all shadow-md"
               >
                 <div className="text-lg font-semibold">Manage Team Members</div>
                 <div className="text-sm opacity-90 mt-1">
@@ -1237,7 +1306,7 @@ function BrandOwnerDashboard({
               </button>
               <button
                 onClick={() => setActiveTab("ewallet")}
-                className="p-4 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-md"
+                className="p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-md"
               >
                 <div className="text-lg font-semibold">E-Wallet</div>
                 <div className="text-sm opacity-90 mt-1">
@@ -1246,27 +1315,61 @@ function BrandOwnerDashboard({
               </button>
               <button
                 onClick={() => setActiveTab("incomewallet")}
-                className="p-4 bg-linear-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-md"
+                className="p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-md"
               >
                 <div className="text-lg font-semibold">Income Wallet</div>
                 <div className="text-sm opacity-90 mt-1">Withdraw earnings</div>
               </button>
               <button
-                onClick={() => setActiveTab("bank")}
-                className="p-4 bg-linear-to-r from-blue-500 to-teal-500 text-white rounded-lg hover:from-blue-600 hover:to-teal-600 transition-all shadow-md"
+                onClick={() => setActiveTab("kyc")}
+                className="p-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all shadow-md"
               >
-                <div className="text-lg font-semibold">Bank Account Verification</div>
+                <div className="text-lg font-semibold">KYC Verification</div>
+                <div className="text-sm opacity-90 mt-1">
+                  Complete your verification
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab("bank")}
+                className="p-4 bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-lg hover:from-blue-600 hover:to-teal-600 transition-all shadow-md"
+              >
+                <div className="text-lg font-semibold">
+                  Bank Account Verification
+                </div>
                 <div className="text-sm opacity-90 mt-1">
                   Verify your bank details
                 </div>
               </button>
               <button
-                onClick={() => setActiveTab("kyc")}
-                className="p-4 bg-linear-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 transition-all shadow-md"
+                onClick={() => setShowInvoiceModal(true)}
+                className="p-4 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-lg hover:from-indigo-600 hover:to-indigo-700 transition-all shadow-md"
               >
-                <div className="text-lg font-semibold">KYC Verification</div>
+                <div className="text-lg font-semibold">Create Invoice</div>
                 <div className="text-sm opacity-90 mt-1">
-                  Complete your verification
+                  Generate customer invoices
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab("coupons")}
+                className="p-4 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg hover:from-pink-600 hover:to-pink-700 transition-all shadow-md"
+              >
+                <div className="text-lg font-semibold">Manage Coupons</div>
+                <div className="text-sm opacity-90 mt-1">
+                  Create and manage discount coupons
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab("manageBusiness")}
+                className="p-4 bg-gradient-to-r from-teal-500 to-teal-600 text-white rounded-lg hover:from-teal-600 hover:to-teal-700 transition-all shadow-md"
+              >
+                <div className="flex items-center">
+                  <Store size={24} className="mr-3" />
+                  <div className="text-left">
+                    <div className="font-semibold">Manage Business</div>
+                    <div className="text-sm opacity-90">
+                      Complete business management
+                    </div>
+                  </div>
                 </div>
               </button>
             </div>
@@ -7865,587 +7968,16 @@ function BrandOwnerDashboard({
           </div>
         );
 
-      case 'creditwallet':
+      case "coupons":
+        return <CouponManagement user={user} />;
+
+      case "manageBusiness":
         return (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold mb-6">Credit Wallet</h2>
-            
-            {/* Credit Wallet Balance Card */}
-            <div className="mb-8 p-4 bg-purple-50 rounded-lg">
-              <div className="bg-white p-6 rounded-lg shadow">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <div className="text-sm text-gray-500 mb-1">Available Credits</div>
-                    <div className="text-3xl font-bold text-purple-600">{financialData.creditWallet}</div>
-                    <div className="text-xs text-gray-500 mt-1">Reward Credits earned from franchise performance</div>
-                  </div>
-                  <div className="bg-purple-100 rounded-full p-3">
-                    <Award size={24} className="text-purple-600" />
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Franchise Performance */}
-            <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="p-4 border border-gray-200 rounded-lg">
-                <h3 className="text-lg font-semibold mb-4 text-blue-600">Franchise A (Left Side)</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Current Turnover:</span>
-                    <span className="font-medium">₹{financialData.franchiseATurnover.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Credits Earned:</span>
-                    <span className="font-medium">{calculateRewardCredits(financialData.franchiseATurnover)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Next Threshold:</span>
-                    <span className="font-medium">
-                      {financialData.franchiseATurnover < 200000 
-                        ? `₹${(200000 - financialData.franchiseATurnover).toLocaleString()} to reach 10 credits`
-                        : financialData.franchiseATurnover < 700000
-                        ? `₹${(700000 - financialData.franchiseATurnover).toLocaleString()} to reach 25 credits`
-                        : financialData.franchiseATurnover < 1700000
-                        ? `₹${(1700000 - financialData.franchiseATurnover).toLocaleString()} to reach 45 credits`
-                        : `₹${(Math.ceil(financialData.franchiseATurnover / 2000000) * 2000000 - financialData.franchiseATurnover).toLocaleString()} to reach next level`
-                      }
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="p-4 border border-gray-200 rounded-lg">
-                <h3 className="text-lg font-semibold mb-4 text-blue-600">Franchise B (Right Side)</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Current Turnover:</span>
-                    <span className="font-medium">₹{financialData.franchiseBTurnover.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Credits Earned:</span>
-                    <span className="font-medium">{calculateRewardCredits(financialData.franchiseBTurnover)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Next Threshold:</span>
-                    <span className="font-medium">
-                      {financialData.franchiseBTurnover < 200000 
-                        ? `₹${(200000 - financialData.franchiseBTurnover).toLocaleString()} to reach 10 credits`
-                        : financialData.franchiseBTurnover < 700000
-                        ? `₹${(700000 - financialData.franchiseBTurnover).toLocaleString()} to reach 25 credits`
-                        : financialData.franchiseBTurnover < 1700000
-                        ? `₹${(1700000 - financialData.franchiseBTurnover).toLocaleString()} to reach 45 credits`
-                        : `₹${(Math.ceil(financialData.franchiseBTurnover / 2000000) * 2000000 - financialData.franchiseBTurnover).toLocaleString()} to reach next level`
-                      }
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Reward Structure Information */}
-            <div className="mb-8 p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-lg font-semibold mb-4">Reward Structure</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">First ₹200,000 turnover:</span>
-                  <span className="font-medium">10 Reward Credits</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Next ₹500,000 turnover:</span>
-                  <span className="font-medium">15 Reward Credits</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Next ₹1,000,000 turnover:</span>
-                  <span className="font-medium">20 Reward Credits</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Every additional ₹2,000,000:</span>
-                  <span className="font-medium">25 Reward Credits</span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Credit History */}
-            <div>
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold">Credit History</h3>
-                <button 
-                  onClick={() => setShowCreditDetails(!showCreditDetails)}
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                >
-                  {showCreditDetails ? 'Hide Details' : 'Show Details'}
-                </button>
-              </div>
-              
-              {creditHistory.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Franchise
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Turnover
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Credits Earned
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Total Credits
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {creditHistory.map((credit, index) => (
-                        <tr key={index}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {credit.date}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {credit.franchise}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            ₹{credit.turnover.toLocaleString()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-purple-600">
-                            +{credit.creditsEarned}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-purple-600">
-                            {credit.totalCredits}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
-                  <p className="text-center text-gray-500">No credit history found</p>
-                </div>
-              )}
-            </div>
-          </div>
-        );
-                    turnover to earn credits!
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Credit Tiers Information */}
-            <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
-              <h4 className="font-semibold text-gray-800 mb-4">
-                🏆 Credit Earning Tiers
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-white p-4 rounded-lg border-l-4 border-blue-500">
-                  <div className="text-sm text-gray-600 mb-1">
-                    First ₹200,000
-                  </div>
-                  <div className="text-2xl font-bold text-blue-600">
-                    10 Credits
-                  </div>
-                </div>
-                <div className="bg-white p-4 rounded-lg border-l-4 border-green-500">
-                  <div className="text-sm text-gray-600 mb-1">
-                    Next ₹500,000
-                  </div>
-                  <div className="text-2xl font-bold text-green-600">
-                    15 Credits
-                  </div>
-                </div>
-                <div className="bg-white p-4 rounded-lg border-l-4 border-purple-500">
-                  <div className="text-sm text-gray-600 mb-1">
-                    Next ₹1,000,000
-                  </div>
-                  <div className="text-2xl font-bold text-purple-600">
-                    20 Credits
-                  </div>
-                </div>
-                <div className="bg-white p-4 rounded-lg border-l-4 border-yellow-500">
-                  <div className="text-sm text-gray-600 mb-1">
-                    Every ₹2,000,000+
-                  </div>
-                  <div className="text-2xl font-bold text-yellow-600">
-                    25 Credits
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'franchiseA':
-        return (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold mb-6">Franchise A (Left Team)</h2>
-            {franchiseA ? (
-              <div>
-                <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">Current Turnover</div>
-                      <div className="text-xl font-bold text-blue-600">₹{financialData.franchiseATurnover.toLocaleString()}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">Credits Earned</div>
-                      <div className="text-xl font-bold text-purple-600">{calculateRewardCredits(financialData.franchiseATurnover)}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">Next Threshold</div>
-                      <div className="text-sm font-medium">
-                        {financialData.franchiseATurnover < 200000 
-                          ? `₹${(200000 - financialData.franchiseATurnover).toLocaleString()}`
-                          : financialData.franchiseATurnover < 700000
-                          ? `₹${(700000 - financialData.franchiseATurnover).toLocaleString()}`
-                          : financialData.franchiseATurnover < 1700000
-                          ? `₹${(1700000 - financialData.franchiseATurnover).toLocaleString()}`
-                          : `₹${(Math.ceil(financialData.franchiseATurnover / 2000000) * 2000000 - financialData.franchiseATurnover).toLocaleString()}`
-                        }
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          S.No
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          User ID
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          User Name
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date of Joining
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          KYC Status
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Purchase Value
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {franchiseA.direct ? (
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{franchiseA.direct.id}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{franchiseA.direct.name}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{franchiseA.direct.joinDate}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              franchiseA.direct.kycVerified 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-red-100 text-red-800'
-                            }`}>
-                              {franchiseA.direct.kycVerified ? 'Verified' : 'Not Verified'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{franchiseA.direct.purchaseValue || 0}</td>
-                        </tr>
-                      ) : (
-                        <tr>
-                          <td colSpan="6" className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                            No direct referral in Franchise A
-                          </td>
-                        </tr>
-                      )}
-                      {franchiseA.grandchildren.map((child, index) => (
-                        <tr key={child.id}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{index + 2}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{child.id}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{child.name}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{child.joinDate}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              child.kycVerified 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-red-100 text-red-800'
-                            }`}>
-                              {child.kycVerified ? 'Verified' : 'Not Verified'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{child.purchaseValue || 0}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ) : (
-              <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
-                <p className="text-center text-gray-500">No data available for Franchise A</p>
-              </div>
-            )}
-          </div>
-        );
-        
-      case 'franchiseB':
-        return (
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold mb-6">Franchise B (Right Team)</h2>
-            {franchiseB ? (
-              <div>
-                <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">Current Turnover</div>
-                      <div className="text-xl font-bold text-blue-600">₹{financialData.franchiseBTurnover.toLocaleString()}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">Credits Earned</div>
-                      <div className="text-xl font-bold text-purple-600">{calculateRewardCredits(financialData.franchiseBTurnover)}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500 mb-1">Next Threshold</div>
-                      <div className="text-sm font-medium">
-                        {financialData.franchiseBTurnover < 200000 
-                          ? `₹${(200000 - financialData.franchiseBTurnover).toLocaleString()}`
-                          : financialData.franchiseBTurnover < 700000
-                          ? `₹${(700000 - financialData.franchiseBTurnover).toLocaleString()}`
-                          : financialData.franchiseBTurnover < 1700000
-                          ? `₹${(1700000 - financialData.franchiseBTurnover).toLocaleString()}`
-                          : `₹${(Math.ceil(financialData.franchiseBTurnover / 2000000) * 2000000 - financialData.franchiseBTurnover).toLocaleString()}`
-                        }
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          S.No
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          User ID
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          User Name
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date of Joining
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          KYC Status
-                        </th>
-                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Purchase Value
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {franchiseB.direct ? (
-                        <tr>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">1</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{franchiseB.direct.id}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{franchiseB.direct.name}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{franchiseB.direct.joinDate}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              franchiseB.direct.kycVerified 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-red-100 text-red-800'
-                            }`}>
-                              {franchiseB.direct.kycVerified ? 'Verified' : 'Not Verified'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{franchiseB.direct.purchaseValue || 0}</td>
-                        </tr>
-                      ) : (
-                        <tr>
-                          <td colSpan="6" className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                            No direct referral in Franchise B
-                          </td>
-                        </tr>
-                      )}
-                      {franchiseB.grandchildren.map((child, index) => (
-                        <tr key={child.id}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{index + 2}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{child.id}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{child.name}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{child.joinDate}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              child.kycVerified 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-red-100 text-red-800'
-                            }`}>
-                              {child.kycVerified ? 'Verified' : 'Not Verified'}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{child.purchaseValue || 0}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ) : (
-              <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
-                <p className="text-center text-gray-500">No data available for Franchise B</p>
-              </div>
-            )}
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-2xl font-bold text-blue-600 mb-1">
-                      Franchise A
-                    </h3>
-                    <p className="text-sm text-gray-600">Left Side Turnover</p>
-                  </div>
-                  <div className="text-3xl">🏢</div>
-                </div>
-                <div className="bg-white p-4 rounded-lg mb-4">
-                  <div className="text-sm text-gray-600 mb-1">
-                    Total Turnover
-                  </div>
-                  <div className="text-3xl font-bold text-blue-600">
-                    ₹
-                    {(
-                      financialData.franchiseAPurchaseValue || 0
-                    ).toLocaleString()}
-                  </div>
-                </div>
-                <div className="bg-white p-4 rounded-lg">
-                  <div className="text-sm text-gray-600 mb-1">
-                    Franchise A Earned Turnover
-                  </div>
-                  <div className="text-2xl font-bold text-indigo-600">
-                    ₹{(financialData.franchiseATurnover || 0).toLocaleString()}
-                  </div>
-                </div>
-              </div>
-
-              {/* Franchise B */}
-              <div className="p-6 bg-linear-to-br from-green-50 to-emerald-50 rounded-lg border border-green-200">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-2xl font-bold text-green-600 mb-1">
-                      Franchise B
-                    </h3>
-                    <p className="text-sm text-gray-600">Right Side Turnover</p>
-                  </div>
-                  <div className="text-3xl">🏢</div>
-                </div>
-                <div className="bg-white p-4 rounded-lg mb-4">
-                  <div className="text-sm text-gray-600 mb-1">
-                    Total Turnover
-                  </div>
-                  <div className="text-3xl font-bold text-green-600">
-                    ₹
-                    {(
-                      financialData.franchiseBPurchaseValue || 0
-                    ).toLocaleString()}
-                  </div>
-                </div>
-                <div className="bg-white p-4 rounded-lg">
-                  <div className="text-sm text-gray-600 mb-1">
-                    Franchise B Earned Turnover
-                  </div>
-                  <div className="text-2xl font-bold text-emerald-600">
-                    ₹{(financialData.franchiseBTurnover || 0).toLocaleString()}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Combined Metrics */}
-            <div className="bg-linear-to-r from-purple-50 to-pink-50 p-6 rounded-lg border border-purple-200 mb-8">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                Combined Franchise Metrics
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white p-4 rounded-lg">
-                  <div className="text-sm text-gray-600 mb-1">
-                    Total Franchise Turnover
-                  </div>
-                  <div className="text-2xl font-bold text-purple-600">
-                    ₹
-                    {(
-                      (financialData.franchiseATurnover || 0) +
-                      (financialData.franchiseBTurnover || 0)
-                    ).toLocaleString()}
-                  </div>
-                </div>
-                <div className="bg-white p-4 rounded-lg">
-                  <div className="text-sm text-gray-600 mb-1">
-                    Balanced Volume
-                  </div>
-                  <div className="text-2xl font-bold text-pink-600">
-                    ₹
-                    {Math.min(
-                      financialData.franchiseATurnover || 0,
-                      financialData.franchiseBTurnover || 0,
-                    ).toLocaleString()}
-                  </div>
-                </div>
-                <div className="bg-white p-4 rounded-lg">
-                  <div className="text-sm text-gray-600 mb-1">
-                    Carry Forward Volume
-                  </div>
-                  <div className="text-2xl font-bold text-indigo-600">
-                    ₹
-                    {Math.abs(
-                      (financialData.franchiseATurnover || 0) -
-                        (financialData.franchiseBTurnover || 0),
-                    ).toLocaleString()}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Franchise Details */}
-            <div className="bg-gray-50 p-6 rounded-lg">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                📊 Franchise Structure
-              </h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-                  <span className="text-gray-700">
-                    Franchise A Direct Children
-                  </span>
-                  <span className="font-semibold text-blue-600">
-                    {userData?.left ? 1 : 0} child
-                  </span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-                  <span className="text-gray-700">
-                    Franchise B Direct Children
-                  </span>
-                  <span className="font-semibold text-green-600">
-                    {userData?.right ? 1 : 0} child
-                  </span>
-                </div>
-                <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-                  <span className="text-gray-700">
-                    Franchise A Income (5% of balanced volume)
-                  </span>
-                  <span className="font-semibold text-indigo-600">
-                    ₹
-                    {(
-                      Math.min(
-                        financialData.franchiseATurnover || 0,
-                        financialData.franchiseBTurnover || 0,
-                      ) * 0.05 || 0
-                    ).toLocaleString()}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ManageBusiness
+            user={user}
+            onNavigateTo={(tab) => setActiveTab(tab)}
+            activeTab={activeTab}
+          />
         );
 
       default:
@@ -8455,6 +7987,534 @@ function BrandOwnerDashboard({
   const handleSetCurrentPage = (page: PageName) => {
     if (setCurrentPage) {
       setCurrentPage(page);
+    }
+  };
+
+  // Menu Drawer Handler Functions
+  const handleMenuClick = () => {
+    setIsMenuOpen(!isMenuOpen);
+    setActiveMenuSection(null);
+  };
+
+  const handleBackToMenu = () => {
+    setActiveMenuSection(null);
+  };
+
+  const handleMenuItemClick = (section) => {
+    setActiveMenuSection(section);
+  };
+
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUserAvatar(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePasswordChange = () => {
+    if (newPassword !== confirmPassword) {
+      alert("New password and confirm password do not match");
+      return;
+    }
+
+    // In a real app, this would call an API to change the password
+    alert("Password changed successfully");
+    setShowPasswordModal(false);
+    if (onLogout) onLogout(); // Log out after password change
+  };
+
+  const handleNotificationChange = (key) => {
+    setNotificationSettings((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  // Convenience wrappers for menu items
+  const handleProfileClick = () => handleMenuItemClick("profile");
+  const handlePasswordClick = () => handleMenuItemClick("password");
+  const handle2FAClick = () => handleMenuItemClick("2fa");
+  const handleOrdersClick = () => handleMenuItemClick("orders");
+  const handleBrandsClick = () => handleMenuItemClick("brands");
+  const handleCreditsClick = () => handleMenuItemClick("credits");
+  const handleChallengesClick = () => handleMenuItemClick("challenges");
+  const handleSettingsClick = () => handleMenuItemClick("settings");
+  const handleFeedbackClick = () => handleMenuItemClick("feedback");
+  const handleLogoutClick = () => {
+    setShowLogoutConfirmation(true);
+    setIsMenuOpen(false);
+  };
+
+  const handleSendVerificationCode = () => {
+    if (phoneNumber.length === 10) {
+      setCodeSent(true);
+      setCountdown(60);
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      alert("Please enter a valid 10-digit phone number");
+    }
+  };
+
+  const handleVerifyCode = () => {
+    if (verificationCode.length === 6) {
+      alert("2FA enabled successfully!");
+      setShowPhoneVerification(false);
+      setPhoneNumber("");
+      setVerificationCode("");
+      setCodeSent(false);
+    } else {
+      alert("Please enter a valid 6-digit code");
+    }
+  };
+
+  const handleChangePhoneNumber = () => {
+    setShowChangePhoneModal(true);
+  };
+
+  const handleConfirmChangePhone = () => {
+    setShowChangePhoneModal(false);
+    setCodeSent(false);
+    setPhoneNumber("");
+    setVerificationCode("");
+  };
+
+  const handleSkip2FA = () => {
+    setShowSkip2FAModal(true);
+  };
+
+  const handleConfirmSkip2FA = () => {
+    setShowSkip2FAModal(false);
+    setShowPhoneVerification(false);
+    setPhoneNumber("");
+  };
+
+  const handleFeedbackSubmit = () => {
+    alert("Thank you for your feedback! We appreciate your input.");
+    setRatings({
+      easeOfUse: 0,
+      features: 0,
+      performance: 0,
+      customerSupport: 0,
+      valueForMoney: 0,
+      overallExperience: 0,
+    });
+    setRecommendationRating(0);
+    setFeedbackText("");
+    setActiveMenuSection(null);
+  };
+
+  const handleConfirmLogout = () => {
+    setShowLogoutConfirmation(false);
+    if (onLogout) {
+      onLogout();
+    }
+  };
+
+  const handleCancelLogout = () => {
+    setShowLogoutConfirmation(false);
+  };
+
+  // Menu Drawer Render Function
+  const renderMenuDrawer = () => {
+    if (!isMenuOpen) return null;
+
+    return (
+      <div className="fixed inset-0 z-50 flex">
+        {/* Backdrop */}
+        <div
+          className="fixed inset-0 bg-black opacity-50"
+          onClick={() => setIsMenuOpen(false)}
+        ></div>
+
+        {/* Menu Content */}
+        <div className="relative flex flex-col w-80 bg-white h-full shadow-xl overflow-hidden">
+          {/* Menu Drawer Header */}
+          <div className="flex items-center justify-between p-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+            <h2 className="text-xl font-bold">Menu</h2>
+            <button
+              onClick={() => setIsMenuOpen(false)}
+              className="p-1 rounded-md hover:bg-white/20 transition-all"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          {/* Menu Content Area */}
+          <div className="flex-1 overflow-y-auto">
+            {!activeMenuSection ? (
+              // Main Menu Grid
+              <div className="p-6">
+                <div className="space-y-3">
+                  <button
+                    onClick={() => handleMenuItemClick("profile")}
+                    className="w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors flex items-center space-x-3"
+                  >
+                    <User size={20} className="text-blue-600" />
+                    <span className="font-medium">Profile</span>
+                  </button>
+                  <button
+                    onClick={() => handleMenuItemClick("orders")}
+                    className="w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors flex items-center space-x-3"
+                  >
+                    <Package size={20} className="text-blue-600" />
+                    <span className="font-medium">Orders</span>
+                  </button>
+                  <button
+                    onClick={() => handleMenuItemClick("brands")}
+                    className="w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 transition-colors flex items-center space-x-3"
+                  >
+                    <Star size={20} className="text-blue-600" />
+                    <span className="font-medium">My Brands</span>
+                  </button>
+                  <button
+                    onClick={() => handleMenuItemClick("credits")}
+                    className="w-full text-left px-4 py-3 rounded-lg hover:bg-amber-50 transition-colors flex items-center space-x-3"
+                  >
+                    <Coins size={20} className="text-amber-600" />
+                    <span className="font-medium">Credits</span>
+                  </button>
+                  <button
+                    onClick={() => handleMenuItemClick("challenges")}
+                    className="w-full text-left px-4 py-3 rounded-lg hover:bg-rose-50 transition-colors flex items-center space-x-3"
+                  >
+                    <Trophy size={20} className="text-rose-600" />
+                    <span className="font-medium">Challenges</span>
+                  </button>
+                  <button
+                    onClick={() => handleMenuItemClick("settings")}
+                    className="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-3"
+                  >
+                    <svg
+                      className="w-5 h-5 text-gray-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                      />
+                    </svg>
+                    <span className="font-medium">Settings</span>
+                  </button>
+                  <button
+                    onClick={() => handleMenuItemClick("feedback")}
+                    className="w-full text-left px-4 py-3 rounded-lg hover:bg-orange-50 transition-colors flex items-center space-x-3"
+                  >
+                    <Star size={20} className="text-orange-600" />
+                    <span className="font-medium">Feedback</span>
+                  </button>
+                  <button
+                    onClick={() => handleMenuItemClick("password")}
+                    className="w-full text-left px-4 py-3 rounded-lg hover:bg-purple-50 transition-colors flex items-center space-x-3"
+                  >
+                    <Lock size={20} className="text-purple-600" />
+                    <span className="font-medium">Change Password</span>
+                  </button>
+                  <button
+                    onClick={() => handleMenuItemClick("2fa")}
+                    className="w-full text-left px-4 py-3 rounded-lg hover:bg-green-50 transition-colors flex items-center space-x-3"
+                  >
+                    <Shield size={20} className="text-green-600" />
+                    <span className="font-medium">2FA Setup</span>
+                  </button>
+                </div>
+
+                {/* Logout Button */}
+                <button
+                  onClick={() => setShowLogoutConfirmation(true)}
+                  className="w-full mt-6 px-4 py-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium flex items-center justify-center space-x-2"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M17 16l4-4m0 0l-4 4m4-4H7a2 2 0 00-2 2v6a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2H7a2 2 0 00-2 2v6a2 2 0 002 2z"
+                    />
+                  </svg>
+                  <span>Logout</span>
+                </button>
+              </div>
+            ) : (
+              // Menu Section Content
+              renderMenuSection(activeMenuSection)
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render individual menu sections
+  const renderMenuSection = (section) => {
+    switch (section) {
+      case "profile":
+        return (
+          <div className="p-6 space-y-4">
+            <button
+              onClick={handleBackToMenu}
+              className="flex items-center text-blue-600 hover:text-blue-700 mb-4"
+            >
+              <ChevronRight size={16} className="rotate-180 mr-1" /> Back
+            </button>
+            <div className="space-y-4">
+              <div className="font-semibold text-lg">Profile Information</div>
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+              />
+              <input
+                type="tel"
+                placeholder="Mobile"
+                value={userMobile}
+                onChange={(e) => setUserMobile(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={userEmail}
+                readOnly
+                className="w-full px-3 py-2 border rounded-lg bg-gray-50"
+              />
+              <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                Save Profile
+              </button>
+            </div>
+          </div>
+        );
+      case "password":
+        return (
+          <div className="p-6 space-y-4">
+            <button
+              onClick={handleBackToMenu}
+              className="flex items-center text-purple-600 hover:text-purple-700 mb-4"
+            >
+              <ChevronRight size={16} className="rotate-180 mr-1" /> Back
+            </button>
+            <div className="space-y-4">
+              <div className="font-semibold text-lg">Change Password</div>
+              <input
+                type="password"
+                placeholder="Current Password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+              />
+              <input
+                type="password"
+                placeholder="New Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+              />
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+              />
+              <button
+                onClick={handlePasswordChange}
+                className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+              >
+                Update Password
+              </button>
+            </div>
+          </div>
+        );
+      case "2fa":
+        return (
+          <div className="p-6 space-y-4">
+            <button
+              onClick={handleBackToMenu}
+              className="flex items-center text-green-600 hover:text-green-700 mb-4"
+            >
+              <ChevronRight size={16} className="rotate-180 mr-1" /> Back
+            </button>
+            <div className="space-y-4">
+              <div className="font-semibold text-lg">
+                Two-Factor Authentication
+              </div>
+              {!codeSent ? (
+                <>
+                  <input
+                    type="tel"
+                    placeholder="Phone Number"
+                    value={phoneNumber}
+                    onChange={(e) =>
+                      setPhoneNumber(e.target.value.replace(/\D/g, ""))
+                    }
+                    maxLength="10"
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                  <button
+                    onClick={handleSendVerificationCode}
+                    className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  >
+                    Send Code
+                  </button>
+                </>
+              ) : (
+                <>
+                  <input
+                    type="text"
+                    placeholder="Enter 6-digit code"
+                    value={verificationCode}
+                    onChange={(e) =>
+                      setVerificationCode(e.target.value.replace(/\D/g, ""))
+                    }
+                    maxLength="6"
+                    className="w-full px-3 py-2 border rounded-lg"
+                  />
+                  <button
+                    onClick={handleVerifyCode}
+                    className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  >
+                    Verify Code
+                  </button>
+                  {countdown > 0 && (
+                    <div className="text-sm text-gray-600">
+                      Resend in {countdown}s
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        );
+      case "credits":
+        return (
+          <div className="p-6 space-y-4">
+            <button
+              onClick={handleBackToMenu}
+              className="flex items-center text-amber-600 hover:text-amber-700 mb-4"
+            >
+              <ChevronRight size={16} className="rotate-180 mr-1" /> Back
+            </button>
+            <div className="space-y-4">
+              <div className="font-semibold text-lg">My Credits</div>
+              <div className="p-4 bg-amber-50 rounded-lg">
+                <div className="text-3xl font-bold text-amber-600">0</div>
+                <div className="text-sm text-gray-600">Credits Available</div>
+              </div>
+              <p className="text-sm text-gray-600">
+                Earn credits by completing challenges and making purchases.
+              </p>
+            </div>
+          </div>
+        );
+      case "feedback":
+        return (
+          <div className="p-6 space-y-4">
+            <button
+              onClick={handleBackToMenu}
+              className="flex items-center text-orange-600 hover:text-orange-700 mb-4"
+            >
+              <ChevronRight size={16} className="rotate-180 mr-1" /> Back
+            </button>
+            <div className="space-y-4">
+              <div className="font-semibold text-lg">Share Feedback</div>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <button
+                    key={i}
+                    onClick={() => setRecommendationRating(i)}
+                    className="transition-all hover:scale-110"
+                  >
+                    <Star
+                      size={24}
+                      className={
+                        i <= recommendationRating
+                          ? "fill-amber-400 text-amber-400"
+                          : "text-gray-300"
+                      }
+                    />
+                  </button>
+                ))}
+              </div>
+              <textarea
+                placeholder="Your feedback..."
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg"
+                rows="4"
+              />
+              <button
+                onClick={handleFeedbackSubmit}
+                className="w-full px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
+              >
+                Submit Feedback
+              </button>
+            </div>
+          </div>
+        );
+      case "settings":
+        return (
+          <div className="p-6 space-y-4">
+            <button
+              onClick={handleBackToMenu}
+              className="flex items-center text-gray-600 hover:text-gray-700 mb-4"
+            >
+              <ChevronRight size={16} className="rotate-180 mr-1" /> Back
+            </button>
+            <div className="space-y-4">
+              <div className="font-semibold text-lg">Notification Settings</div>
+              {Object.keys(notificationSettings).map((key) => (
+                <label
+                  key={key}
+                  className="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
+                >
+                  <input
+                    type="checkbox"
+                    checked={notificationSettings[key]}
+                    onChange={() => handleNotificationChange(key)}
+                    className="mr-3"
+                  />
+                  <span className="font-medium capitalize">
+                    {key.replace(/([A-Z])/g, " $1")}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        );
+      default:
+        return (
+          <div className="p-6">
+            <button
+              onClick={handleBackToMenu}
+              className="flex items-center text-blue-600 hover:text-blue-700 mb-4"
+            >
+              <ChevronRight size={16} className="rotate-180 mr-1" /> Back
+            </button>
+            <p className="text-gray-600">Content coming soon...</p>
+          </div>
+        );
     }
   };
 
@@ -8483,6 +8543,43 @@ function BrandOwnerDashboard({
         onMenuClick={() => setIsMenuOpen(!isMenuOpen)}
         onPortalClick={handlePortalClick}
       />
+
+      {/* Menu Drawer */}
+      {renderMenuDrawer()}
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg w-full max-w-md p-6 shadow-xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Confirm Logout</h3>
+              <button
+                onClick={handleCancelLogout}
+                className="p-1 rounded hover:bg-gray-100"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to logout?
+            </p>
+            <div className="flex space-x-3">
+              <button
+                onClick={handleCancelLogout}
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmLogout}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Dashboard Header with Menu */}
       <div className="bg-white shadow-sm border-b border-gray-200">
@@ -8641,45 +8738,31 @@ function BrandOwnerDashboard({
               >
                 Add Bank Account
               </button>
-              <div className="border-t my-2"></div>
               <button
                 onClick={() => {
-                  setActiveTab("creditwallet");
+                  setActiveTab("coupons");
                   setIsMenuOpen(false);
                 }}
                 className={`w-full text-left px-4 py-2 text-sm font-medium ${
-                  activeTab === "creditwallet"
-                    ? "bg-purple-100 text-purple-700 border-r-4 border-purple-700"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                Credit Wallet
-              </button>
-              <button
-                onClick={() => {
-                  setActiveTab("franchiseA");
-                  setIsMenuOpen(false);
-                }}
-                className={`w-full text-left px-4 py-2 text-sm font-medium ${
-                  activeTab === "franchiseA"
+                  activeTab === "coupons"
                     ? "bg-blue-100 text-blue-700 border-r-4 border-blue-700"
                     : "text-gray-700 hover:bg-gray-100"
                 }`}
               >
-                Franchise A (Left Team)
+                Manage Coupons
               </button>
               <button
                 onClick={() => {
-                  setActiveTab("franchiseB");
+                  setActiveTab("manageBusiness");
                   setIsMenuOpen(false);
                 }}
                 className={`w-full text-left px-4 py-2 text-sm font-medium ${
-                  activeTab === "franchiseB"
+                  activeTab === "manageBusiness"
                     ? "bg-blue-100 text-blue-700 border-r-4 border-blue-700"
                     : "text-gray-700 hover:bg-gray-100"
                 }`}
               >
-                Franchise B (Right Team)
+                Manage Business
               </button>
             </div>
           </div>

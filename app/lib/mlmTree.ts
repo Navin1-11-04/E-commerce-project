@@ -24,6 +24,7 @@ export class TreeNode {
   franchiseATurnover: number;
   franchiseBTurnover: number;
   products: ProductItem[];
+  accessories: ProductItem[];
   creditHistory: CreditEntry[];
   brandName: string;
   kycVerified: boolean;
@@ -65,6 +66,7 @@ export class TreeNode {
     this.franchiseATurnover = 0;
     this.franchiseBTurnover = 0;
     this.products = [];
+    this.accessories = [];
     this.creditHistory = [];
     this.brandName = "";
     this.kycVerified = false;
@@ -1114,6 +1116,44 @@ class MLMTreeManager {
     const user = this.allNodes.get(userId);
     if (!user || user.userType !== "brand_owner") return [];
     return user.products || [];
+  }
+
+  // Accessory management methods for brand owners
+  addAccessory(userId, accessory) {
+    const user = this.allNodes.get(userId);
+    if (!user || user.userType !== "brand_owner")
+      return { success: false, error: "User not found or not a brand owner" };
+    if (!user.accessories) user.accessories = [];
+    user.accessories.push(accessory);
+    return { success: true };
+  }
+
+  updateAccessory(userId, accessory) {
+    const user = this.allNodes.get(userId);
+    if (!user || user.userType !== "brand_owner")
+      return { success: false, error: "User not found or not a brand owner" };
+    if (!user.accessories) user.accessories = [];
+
+    const index = user.accessories.findIndex((a) => a.id === accessory.id);
+    if (index === -1) return { success: false, error: "Accessory not found" };
+
+    user.accessories[index] = accessory;
+    return { success: true };
+  }
+
+  deleteAccessory(userId, accessoryId) {
+    const user = this.allNodes.get(userId);
+    if (!user || user.userType !== "brand_owner")
+      return { success: false, error: "User not found or not a brand owner" };
+    if (!user.accessories) user.accessories = [];
+    user.accessories = user.accessories.filter((a) => a.id !== accessoryId);
+    return { success: true };
+  }
+
+  getAccessories(userId) {
+    const user = this.allNodes.get(userId);
+    if (!user || user.userType !== "brand_owner") return [];
+    return user.accessories || [];
   }
 }
 
